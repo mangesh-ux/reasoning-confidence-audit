@@ -1,0 +1,64 @@
+# Findings
+
+## ESTABLISHED IN CURRENT SANDBOX: measurement boundary
+
+Q3 and Q6 show that, in the studied Q4_K_M batches, the released forced probe
+can continue after the candidate answer is complete.
+
+| Frozen analysis | Completed boxes before released termination | Post-box released-window NLL share |
+| --- | ---: | ---: |
+| Q3 development | 60 / 60 | mean 78.61%, median 84.28% |
+| Q6 preregistered holdout | 36 / 36 | mean 74.44%, median 72.72% |
+
+On Q6, the median absolute difference between `c_full` and BAC was 0.193568.
+Stopping each trial at an already-completed box boundary would change counted
+trial-probe generation from 756 to 156 tokens. This is a **79.37%
+counterfactual reduction in trial-probe generated tokens on the Q6 holdout**;
+it is not total inference saving and does not establish an accuracy change.
+
+## EXPLORATORY: correctness ranking
+
+On frozen Q3 development probes, BAC had stronger correctness-ranking metrics
+than the released full-span signal:
+
+| Signal | AUROC | AUPRC | Directly evaluable probes |
+| --- | ---: | ---: | ---: |
+| Released `c_full` | 0.6894 | 0.4333 | 59 |
+| BAC | 0.9981 | 0.9924 | 59 |
+
+This is descriptive development evidence, not a calibrated threshold or a safe
+stopping rule. Q6 had 36 directly evaluable candidates, all incorrect, so it
+could not estimate a corresponding holdout ranking metric.
+
+## ESTABLISHED IN CURRENT SANDBOX: Q7 precision fidelity
+
+Q7 fixed the reasoning prefix and forced-candidate tokens before comparing
+precisions. It is a probe-level fidelity check, not an end-to-end accuracy
+benchmark.
+
+| Pair | Fixed paired checkpoints | Exact normalized candidate agreement | BAC Pearson / Spearman |
+| --- | ---: | ---: | ---: |
+| Q8_0 vs Q4_K_M | 30 | 15 / 30 | 0.856 / 0.922 |
+| BF16 vs Q8_0 | 12 | 11 / 12 | 0.995 / 1.000 |
+| BF16 vs Q4_K_M | 12 | 5 / 12 | 0.953 / 0.979 |
+
+Q4 BAC rankings were partly aligned with Q8 and BF16, but its candidate
+fidelity was not established. The appropriate roles for future work are:
+
+- `Q4_K_M`: historical exploratory/discovery backend.
+- `Q8_0`: primary practical validation backend.
+- `BF16`: selective fidelity anchor only.
+
+`TQ1_0` was an unusable extreme post-training ternary stress condition: 0 of
+32 scheduled probes completed an outer candidate box. It is reported as a
+negative result, not as a comparison to BitNet-style trained ternary models.
+
+The compact values are in
+[results/q7_precision_summary.json](../results/q7_precision_summary.json).
+
+## Not established
+
+The completed audit does not establish that BAC improves final-answer accuracy,
+that any absolute BAC threshold is safe, that Q4 generalizes to BF16, or that a
+new stopping policy improves end-to-end cost. Those are questions for the
+unrun protocol in [next_study_protocol.md](next_study_protocol.md).

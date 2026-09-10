@@ -1,0 +1,65 @@
+{
+  "release_contents": "Compact aggregate results and provenance only; no raw trajectories, raw token-logprob traces, model weights, binaries, datasets, or full probe tables.",
+  "q7_status": "COMPLETE; compact fixed-prefix precision-fidelity results are included, while raw Q7 probe artifacts remain private.",
+  "source_artifacts": [
+    {
+      "bytes": 5980,
+      "path": "quantized_sandbox/outputs/q3_summary.json",
+      "sha256": "e8830be4a184c448133683fc648757bbd7ede56fd00d3accaa614a9526ae9b11",
+      "role": "Q3 aggregate measurement-boundary summary"
+    },
+    {
+      "bytes": 26765,
+      "path": "quantized_sandbox/outputs/q4_predictive_metrics.json",
+      "sha256": "d73b5aa1f3a6b4e5b0876407b73daa2064a11d4d63949271770f4d9d2596034a",
+      "role": "Q4 frozen development analysis provenance"
+    },
+    {
+      "bytes": 190188,
+      "path": "quantized_sandbox/outputs/q5_measurement_metrics.json",
+      "sha256": "131a1544ad7bef764a6e6f998aec56acc5cd6c4c950addef45344b2c29de0fe6",
+      "role": "Q5 frozen development measurement decomposition"
+    },
+    {
+      "bytes": 256666,
+      "path": "quantized_sandbox/outputs/q6_holdout_metrics.json",
+      "sha256": "d7847176af6022778474d9e89e085e85398f51cae58de88ba2ea4e599edb1388",
+      "role": "Q6 preregistered holdout aggregate metrics"
+    },
+    {
+      "bytes": 25922,
+      "path": "quantized_sandbox/outputs/q6_holdout_preregistration.json",
+      "sha256": "017d00cc50c4bbc45a1c8ca0d29bd13d22848fd61a77c5e2f36094165ea98322",
+      "role": "Q6 selection manifest"
+    },
+    {
+      "bytes": 2072,
+      "path": "quantized_sandbox/outputs/q6_holdout_analysis_preregistration.json",
+      "sha256": "c020e4cc4910c2d6df880c876364c468c2e6ddad79941714b71a111db80a6e03",
+      "role": "Q6 pre-probe interpretation rules"
+    },
+    {
+      "bytes": 91962,
+      "path": "quantized_sandbox/outputs/q7_precision_metrics.json",
+      "sha256": "db7b01126a476eab29ee73e02075a8d836395212219c2ebd08058264c11eaa23",
+      "role": "Q7 compact precision-fidelity metrics source"
+    },
+    {
+      "bytes": 1303745,
+      "path": "quantized_sandbox/outputs/q7_precision_checkpoint_manifest.json",
+      "sha256": "c5795c80b5d264697a8be5e3f99832a1811ac4eb8f2276975552b29008a728cd",
+      "role": "Q7 frozen checkpoint and token-prefix manifest; not redistributed"
+    }
+  ],
+  "upstream": {
+    "codestop_commit": "b5081e7c2abe23bb1d19649421cc13522fee7c50",
+    "codestop_repository": "https://github.com/sudoparsa/CoDE-Stop",
+    "llama_cpp_commit": "7798007a29a90e3053e799394da48cf53a2f8e0f",
+    "llama_cpp_repository": "https://github.com/ggml-org/llama.cpp"
+  },
+  "related_work_references_only": {
+    "conformal_thinking": "https://arxiv.org/abs/2602.03814",
+    "puma": "https://arxiv.org/abs/2605.17672",
+    "token_probability_calibration": "https://arxiv.org/abs/2608.07827"
+  }
+}

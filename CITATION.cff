@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use this audit release, cite it together with the upstream CoDE-Stop paper."
+title: "Reasoning Confidence Audit: Reproducing and Stress-Testing Confidence-Based Early Stopping in Reasoning LLMs"
+type: software
+version: "2026.09"
+date-released: 2026-09-10
+authors:
+  - name: "Reasoning Confidence Audit contributors"
+abstract: "A compact public release for a frozen Q0-Q7 audit of CoDE-Stop confidence measurement semantics and fixed-prefix precision fidelity, plus an unrun risk-controlled next-study protocol."
+keywords:
+  - reasoning models
+  - early stopping
+  - confidence measurement
+  - reproducibility
+  - quantization
+references:
+  - type: article
+    title: "Early Stopping for Large Reasoning Models via Confidence Dynamics"
+    authors:
+      - family-names: Hosseini
+        given-names: Parsa
+      - family-names: Nawathe
+        given-names: Sumit
+      - family-names: Salmani
+        given-names: Mahdi
+      - family-names: Razaviyayn
+        given-names: Meisam
+      - family-names: Feizi
+        given-names: Soheil
+    year: 2026
+    url: "https://arxiv.org/abs/2604.04930"
+  - type: article
+    title: "Conformal Thinking"
+    year: 2026
+    url: "https://arxiv.org/abs/2602.03814"
+  - type: article
+    title: "PUMA / Stop When Reasoning Converges"
+    year: 2026
+    url: "https://arxiv.org/abs/2605.17672"
+  - type: article
+    title: "From token probabilities to calibrated confidence"
+    year: 2026
+    url: "https://arxiv.org/abs/2608.07827"

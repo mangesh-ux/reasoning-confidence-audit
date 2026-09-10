@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "study": "Q7 controlled precision-fidelity and extreme-quantization stress test",
+  "status": "complete",
+  "scope": "Frozen reasoning prefixes and forced-candidate probes only; not an end-to-end benchmark or a faithful BF16 reproduction.",
+  "source_artifact": {
+    "path": "quantized_sandbox/outputs/q7_precision_metrics.json",
+    "bytes": 91962,
+    "sha256": "db7b01126a476eab29ee73e02075a8d836395212219c2ebd08058264c11eaa23"
+  },
+  "frozen_design": {
+    "primary_checkpoint_count": 30,
+    "bf16_subset_checkpoint_count": 12,
+    "prefix_reuse": "The paired probes reused frozen base-prompt, reasoning-prefix, and forced-suffix token IDs with greedy candidate decoding."
+  },
+  "candidate_agreement": {
+    "Q8_0_vs_Q4_K_M": {
+      "agreement_count": 15,
+      "comparable_pair_count": 30,
+      "agreement_fraction": 0.5
+    },
+    "BF16_vs_Q8_0": {
+      "agreement_count": 11,
+      "comparable_pair_count": 12,
+      "agreement_fraction": 0.9166666666666666
+    },
+    "BF16_vs_Q4_K_M": {
+      "agreement_count": 5,
+      "comparable_pair_count": 12,
+      "agreement_fraction": 0.4166666666666667
+    }
+  },
+  "BAC": {
+    "Q8_0_vs_Q4_K_M": {
+      "mean_absolute_difference": 0.07153330779487062,
+      "pearson_correlation": 0.8559893663783598,
+      "spearman_correlation": 0.9221357063403782
+    },
+    "BF16_vs_Q8_0": {
+      "mean_absolute_difference": 0.016213139063543127,
+      "pearson_correlation": 0.995474459570919,
+      "spearman_correlation": 1.0
+    },
+    "BF16_vs_Q4_K_M": {
+      "mean_absolute_difference": 0.061066257091506426,
+      "pearson_correlation": 0.9530134781759545,
+      "spearman_correlation": 0.9790209790209791
+    }
+  },
+  "TQ1_0_extreme_post_training_ternary_stress": {
+    "scheduled_probe_count": 32,
+    "outer_box_closed_count": 0,
+    "malformed_probe_count": 32,
+    "usable_for_candidate_or_BAC_comparison": false,
+    "interpretation": "TQ1_0 is an extreme post-training ternary stress condition, not a BitNet-style trained ternary model."
+  },
+  "interpretation": {
+    "Q4_K_M": "Historical exploratory/discovery backend; candidate fidelity was not established.",
+    "Q8_0": "Primary practical validation backend for the next study.",
+    "BF16": "Selective fidelity anchor only."
+  }
+}
