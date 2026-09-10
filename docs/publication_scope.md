@@ -28,11 +28,14 @@ probe candidates. Q7 shows that Q8 is a stronger practical fidelity backend
 than Q4 for the observed fixed-prefix candidates, not that Q4 generalizes to
 BF16.
 
-Step 5 is a proposed integration, not an established result. The frozen
-20-example calibration/UCB design has a known feasibility limitation at the
-pre-specified `epsilon` values and may terminate as underpowered before test
-inference. That outcome should be reported honestly rather than repaired
-post-hoc.
+Step 5 is a proposed integration, not an established result. Before any
+MATH500 inference, the original infeasible 20-example calibration draft was
+replaced with a 100-calibration/100-untouched-test design at fixed
+`epsilon = {0.15, 0.20}` and `delta = 0.10`. The feasibility calculation and
+the reason for the correction are preserved in
+[protocol_feasibility.md](protocol_feasibility.md). The corrected study still
+has predeclared abort rules and must preserve an underpowered or negative result
+rather than repair its protocol after test data are seen.
 
 ## Relationship to prior work
 
@@ -50,3 +53,7 @@ The eventual contribution depends on the next study succeeding under its
 predeclared protocol. Until then, this is not a claim of a new state of the
 art, improved CoDE-Stop accuracy, a faithful BF16 reproduction, a TMLR
 submission, an accepted publication, or a validated new stopping method.
+
+If BAC does not improve the risk-compute trade-off under the paired
+risk-controlled comparison, the project preserves that negative result and
+does not add another stopping signal within this research direction.

@@ -5,6 +5,10 @@ llama.cpp source or binaries, benchmark datasets, Qwen model weights, raw
 reasoning trajectories, raw token-logprob traces, or code from the papers
 listed below.
 
+The `reasoning_confidence` package is an independent, small implementation of
+documented audit behavior. It is not copied from or derived by vendoring code
+from CoDE-Stop, llama.cpp, Conformal Thinking, or the other cited projects.
+
 ## CoDE-Stop
 
 The audit concerns

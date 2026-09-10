@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reasoning-confidence-audit"
+version = "0.1.0"
+description = "Reusable instrumentation for auditing reasoning-answer confidence boundaries"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]

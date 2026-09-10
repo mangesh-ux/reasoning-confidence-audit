@@ -60,9 +60,21 @@ validates their structure, and writes a public summary. It is not a model
 runner and does not start a server, generate tokens, tune thresholds, or alter
 frozen artifacts.
 
+The public [`reasoning_confidence`](../src/README.md) package also exposes the
+small reusable implementation layer: candidate-boundary parsing, the released
+full-span reconstruction, BAC, released-style checkpoint membership, a
+manually configured boundary-stopped completion client, and paired-result
+helpers. Its tests use synthetic fixtures only. The package does not contain
+private Q0–Q7 traces, benchmark rows, upstream source, model weights, or an
+automatic inference runtime.
+
 ## Next study
 
 The proposed risk-controlled study is intentionally separate from the completed
 audit. Its pre-specified data split, runtime, loss, UCB procedure, abort rules,
 and reporting requirements are in
-[next_study_protocol.md](next_study_protocol.md). It has not been executed.
+[next_study_protocol.md](next_study_protocol.md). Its original 20-example
+calibration plan was corrected before inference because it could not certify
+the original risk targets; the calculation is preserved in
+[protocol_feasibility.md](protocol_feasibility.md). The corrected study has not
+been executed.

@@ -124,7 +124,10 @@ upper-threshold risk-control procedure. It does not add semantic redundancy,
 PUMA, ternary quantization, CUSUM, a lower/unsolvable threshold, or another
 stopping signal. Related work and the deliberate boundary are documented in
 [docs/research_overview.md](docs/research_overview.md) and
-[docs/related_work.md](docs/related_work.md).
+[docs/related_work.md](docs/related_work.md). The corrected pre-inference
+design uses 200 deterministically selected MATH500 examples (100 calibration,
+100 untouched test) and operating points `epsilon = 0.15, 0.20`; see
+[docs/protocol_feasibility.md](docs/protocol_feasibility.md).
 
 ## Repository structure
 
@@ -132,11 +135,42 @@ stopping signal. Related work and the deliberate boundary are documented in
 docs/       Research overview, frozen next-study protocol, findings, limits, and resume text
 figures/    One editable conceptual SVG
 results/    Compact aggregate metrics and artifact provenance only
-src/        Standard-library result packager; not a model runner
+src/        Reusable audit package and a standard-library result packager
+tests/      Synthetic offline tests; no model, GPU, dataset, or network required
+examples/   A small synthetic released-span-versus-boundary demo
 licenses/   Upstream-license and attribution notices
 ```
 
+## Core implementation
+
+`src/reasoning_confidence/` exposes the clean, reusable audit logic developed
+from the frozen experiments:
+
+- candidate-boundary detection with nested-brace handling;
+- released full-span confidence reconstruction and BAC;
+- released-style checkpoint membership handling;
+- a manually configured, greedy local llama.cpp `/completion` probe that stops
+  at the candidate boundary; and
+- small helpers for candidate agreement, paired confidence comparison, and
+  probe-token accounting.
+
+The package is intentionally small and uses the Python standard library. It
+does not start a server, load a model, contain upstream source code, or claim
+to reproduce all Q0–Q7 inference end-to-end without the separate frozen
+artifact tree. See [src/README.md](src/README.md) for the public API boundary.
+
 ## Reproducing the analyses
+
+Run the synthetic implementation checks from the repository root:
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m unittest discover -s tests -v
+python examples\synthetic_probe_demo.py
+```
+
+They use only synthetic token and log-probability fixtures. No GPU, weights,
+dataset, network access, or llama.cpp server is required.
 
 The 5–10 minute public check rebuilds the compact result summary without a
 model, server, or dataset download:

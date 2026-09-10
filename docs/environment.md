@@ -28,6 +28,11 @@ The compact result packager requires only a recent Python interpreter with the
 standard library. No model, GPU, server, or dataset access is needed for the
 public verification command in the repository README.
 
+The public `reasoning_confidence` package, its synthetic unit tests, and its
+synthetic example also require only the Python standard library. Its optional
+completion client can contact a separately started local llama.cpp server, but
+it neither starts nor configures that runtime.
+
 ## Full reproduction boundary
 
 A full inference rerun requires separately obtaining the upstream CoDE-Stop

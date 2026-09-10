@@ -1,5 +1,9 @@
 # Resume blurb
 
-- Reproduced and audited confidence-based early stopping for a 4B reasoning model; found that probe confidence often included text generated after the answer was already complete.
-- Built token-level probe instrumentation that ended at the candidate-answer boundary, showing a 79.37% counterfactual reduction in trial-probe generated tokens on an independent Q6 holdout.
-- Ran a frozen Q4/Q8/BF16 precision check: Q8 matched BF16 on 11 of 12 candidate answers, versus 5 of 12 for Q4, guiding the next validation backend.
+- Reproduced and analyzed a recent method for stopping LLM reasoning early,
+  building tools to inspect intermediate answers and token probabilities.
+- Found that confidence could be strongly affected by text generated after the
+  candidate answer; ending the probe at the answer boundary reduced
+  trial-probe generation by 79% in a held-out accounting experiment.
+- Tested quantization effects and found Q8 matched BF16 on 11 of 12
+  fixed-prefix answers, while Q4 matched 5 of 12.
