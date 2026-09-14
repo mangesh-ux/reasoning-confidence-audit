@@ -1,0 +1,77 @@
+{
+  "scope": "M2 confirmatory forced-answer measurement audit",
+  "status": "pre-inference public-safe execution-manifest digest",
+  "private_manifest_sha256": "3daceed8a5c2d637397d5a3a8749d06302931755086dcd65d4972fbb9ae5a38f",
+  "dataset": {
+    "repository": "HuggingFaceH4/MATH-500",
+    "revision": "2343f79f3640c0f795bbf4e3234396cfe9266d0f",
+    "source_file_sha256": "35dc41080a3680858b27fa7e0533d2d547825316fc5dafe5d316f4ccc5a06132",
+    "source_file_size_bytes": 446564,
+    "row_count": 500
+  },
+  "selection": {
+    "namespace": "M2_CONFIRMATORY_FORCED_ANSWER_MEASUREMENT_AUDIT_V1",
+    "sample_count": 100,
+    "normalization": "Unicode NFC plus LF line endings",
+    "uses_answers_or_outputs": false,
+    "all_identity_set_sha256": "f6cc865f6b1a7ff72b1796fdad088bcfba8e25f266323aa95b82d13acb3c3dca",
+    "eligible_identity_set_sha256": "7ff5e267f119cc0d147cff832bacc23cb7a052487b94c51ddf3d0d01fc43de54",
+    "selected_identity_set_sha256": "c093d23db336f9b7c9d2501defedf7188e4f9a9d54ea11f70620a4c8482ea30c",
+    "selected_source_row_hash_set_sha256": "f766cc0720077a9c7c065b32c7a6f6766886b7834c9aeb7f55cae739533ec2d3",
+    "m1_private_manifest_sha256": "f8993979491579391fae2e8f6f2e1e2f4de6d62dc37f403141fc8220c65a7e43",
+    "m1_excluded_count": 16,
+    "m1_overlap_count": 0,
+    "p1_shadow_selector": {
+      "protocol_sha256": "4d90acdd486a17d3597c8caead0f1e46e4c0c247003802475d867e73f492c89b",
+      "namespace": "BAC_RC_MATH500_SELECTION_V2",
+      "count": 200,
+      "identity_set_sha256": "ecf8ef54d88422b0bdb00e2e10886869ef8fd5d33d8776e95707cda74d91c55d",
+      "m2_overlap_count": 0,
+      "status": "conservative shadow only; P1 has no materialized sample"
+    },
+    "bf16_anchor": {
+      "count": 12,
+      "checkpoint_release_coordinate": 512,
+      "identity_set_sha256": "45f61fe04ca7a252f0c0988194ac470548ef90273690701e1ae4c793843fd4f7"
+    }
+  },
+  "runtime": {
+    "q8_model_sha256": "0d5964f2837d157bf8d845f09b006254b85389ef4293ec0f41dd8ffeab1ab3f0",
+    "bf16_model_sha256": "89ee1fd110158671b341bf4a8d45bd4859f60ac1ef7252e89233d2492f712814",
+    "server_sha256": "699e9f440f197998458d72c6e0255c0299243ab51e52788f87cfa10dfd187447",
+    "server_impl_sha256": "8f9b9b15bb6e8dddc7089e47a6239460a131392f4d5ea71c37f8be1666d69322",
+    "llama_dll_sha256": "e4dfd8368cba981b3e3dcc9a365393c2eac58ea1040c2f26314602839bad0606",
+    "ggml_cuda_sha256": "dcacdfc3efbd636bd7902a56f911fdc52f794658fa578180da6a19f47e5047a3",
+    "tokenizer_revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "tokenizer_assets_sha256": "b5ef3c08841a7b90b204677625d920584e27e726adf71915155ed04f68cff4cb",
+    "llama_cpp_source_revision": "7798007a29a90e3053e799394da48cf53a2f8e0f"
+  },
+  "design": {
+    "n_ctx": 4096,
+    "base_n_predict": 2048,
+    "checkpoints_release_coordinate": [
+      512,
+      1024,
+      1536
+    ],
+    "max_probe_tokens": 21,
+    "trial_suffix_sha256": "c656b35a801d2133e992429d3ba7cc61988063beb72183aedf86333f75a40163",
+    "trial_suffix_token_ids_sha256": "6e11c3d49afab031cb3d1e148e6dac8b2553a838d719846cd155c2b8908b90ea",
+    "release_terminal_token_ids_sha256": "b7aa536ce15c411059ccba1237fce0c12523cf09578f11c93ebfeec27ea408c9",
+    "thresholds": [
+      0.7,
+      0.8,
+      0.9,
+      0.95
+    ],
+    "bootstrap_replicates": 2000,
+    "bootstrap_master_seed": 20260913,
+    "bf16_anchor_checkpoint": 512,
+    "candidate_evaluator": {
+      "package": "math-verify",
+      "version": "0.9.0",
+      "outer_worker_timeout_seconds": 15.0,
+      "classification": "descriptive only; not the upstream MATH-500 model grader"
+    }
+  }
+}

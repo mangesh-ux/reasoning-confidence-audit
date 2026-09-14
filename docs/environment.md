@@ -22,6 +22,22 @@ Q7 verified that the pinned quantizer supported Q8_0 and TQ1_0 generation.
 TQ1_0 did not have usable CUDA inference support in the pinned source and was
 used only as a CPU-only extreme post-training ternary stress condition.
 
+## M2 runtime-feasibility limitation
+
+M2 used the pinned Q8_0 artifact and a 4096-token context with a 2048-token
+base-generation cap. Its Q8_0 and BF16 load-only preflights passed, but a
+subsequent 65-token-input Q8 base completion stalled after 1,598 generated
+tokens—below both configured limits. The single-slot server did not recover;
+the following request timed out downstream. The server log did not establish
+an OOM, CUDA error, or model/semantic/parser failure, so the internal cause is
+unresolved. The public abort record contains no raw runtime log:
+[m2_runtime_feasibility_abort.md](m2_runtime_feasibility_abort.md).
+
+A future, separately authorized study would require a non-benchmark
+full-length completion soak test, a progress/recovery check, and a newly frozen
+runtime/protocol/cohort. Increasing context or silently switching precision is
+not an evidenced fix for M2.
+
 ## Public aggregate check
 
 The compact result packager requires only a recent Python interpreter with the

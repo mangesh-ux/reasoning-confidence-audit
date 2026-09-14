@@ -1,0 +1,11 @@
+{
+  "scope": "M2 bounded literature-recheck attestation",
+  "stage": "pre_inference",
+  "review_date": "2026-09-14",
+  "status": "no_exact_overlap_located",
+  "exact_overlap_found": false,
+  "freeze_manifest_sha256": "e53f8570e4b897a92838b55d8e9486d1cdcc32ec91ff320999cb6fd5673a99ca",
+  "protocol_sha256": "2f18d72ba7eac01b3025a76b133e6aa8d6d07d1b27c7e1e7d82b38e32cba22d8",
+  "literature_gate_sha256": "b754eb5f29b5bdf3f80a5d0e8ec6325b3fe6f5c1ee8a14f4b26bc19f9f8dc4de",
+  "private_record_sha256": "ab847d7c9a7e05b24ec6b9b26421ce8b6c966f12ef645bdd97346e82cc0e0cb8"
+}

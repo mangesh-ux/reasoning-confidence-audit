@@ -3,22 +3,25 @@
 ## Reproducing and Stress-Testing Confidence-Based Early Stopping in Reasoning LLMs
 
 This repository is a compact, public audit of confidence-based early stopping
-for reasoning language models. It reproduces and examines the released
+for reasoning language models. It examines the released
 [CoDE-Stop](https://github.com/sudoparsa/CoDE-Stop) measurement path, packages
-aggregate evidence from the completed Q0–Q7 sandbox, and freezes one next
-study. It contains no model weights, raw reasoning traces, raw token-logprob
-traces, benchmark rows, or upstream source code.
+aggregate evidence from the completed Q0–Q7 sandbox and M1 feasibility study,
+and records M2's preregistered runtime-feasibility abort. It contains no model
+weights, raw reasoning traces, raw token-logprob traces, benchmark rows, or
+upstream source code.
 
 ## What this project studies
 
-The central question is:
+The completed audit asks:
 
-> Does measuring confidence only over the completed candidate answer, combined
-> with risk-controlled threshold selection, provide a safer and cheaper
-> early-stopping signal than the released CoDE-Stop confidence measurement?
+> Does the pinned released CoDE-Stop forced-answer implementation measure a
+> completed candidate answer, or a mixed span that can include subsequent
+> generated text?
 
-The completed work is an audit, not a new deployed stopping method. The next
-study is a pre-specified protocol and has **not** been run.
+The completed work is an audit, not a new deployed stopping method. The
+separate risk-controlled P1 protocol remains frozen and paused at a
+prior-work gate. M2 was a distinct, preregistered measurement/reproducibility
+attempt; it stopped for a runtime failure before its confirmation threshold.
 
 ## Why confidence-based early stopping matters
 
@@ -57,6 +60,10 @@ sequence.
   claim about total inference savings or answer accuracy.
 - Q7 found that Q8 is substantially closer to BF16 than Q4 in candidate
   identity on its frozen-prefix samples.
+- M1's preregistered Q8_0 feasibility study found continuation after the
+  candidate boundary in 44/44 valid shared pairs. Its score and illustrative
+  threshold differences support only a narrow measurement-audit paper path,
+  not a new score, safe threshold, or realized end-to-end saving.
 
 ### EXPLORATORY OBSERVATIONS
 
@@ -65,12 +72,14 @@ sequence.
 - Q6 contained zero correct probe candidates, so that ranking could not be
   evaluated on the holdout.
 
-### ONGOING QUESTION
+### CONFIRMATORY STATUS
 
-- Can boundary-aligned confidence plus risk-controlled threshold selection
-  provide a safer accuracy/compute trade-off? The protocol is frozen in
-  [docs/next_study_protocol.md](docs/next_study_protocol.md); no claim is made
-  until that study completes.
+- M2 froze a new 100-example Q8_0 confirmatory measurement audit and passed
+  load-only Q8_0/BF16 preflights. It then stopped after 18 primary-valid pairs,
+  below the fixed minimum of 80, when the single-slot Q8 runtime stalled during
+  a base completion and did not recover. It is **not a null-effect result** and
+  it supplies no BF16 or generalization evidence. See the
+  [M2 abort record](docs/m2_runtime_feasibility_abort.md).
 
 ## The measurement boundary
 
@@ -105,34 +114,25 @@ or BAC comparison. It is not treated as a BitNet-style trained ternary model.
 See [docs/findings.md](docs/findings.md) and the compact
 [Q7 result](results/q7_precision_summary.json).
 
-## Current research direction
+## Current status
 
-The next direction is deliberately narrow:
-**BOUNDARY-ALIGNED CONFIDENCE + RISK-CONTROLLED EARLY STOPPING.**
+M1's terminal decision is **Measurement-paper path justified**: a paper can
+audit the named released forced-answer endpoint and score semantics against an
+exact candidate boundary, with the documented reporting omissions and
+nonclaims. Its result record is
+[here](docs/m1_forced_answer_measurement_semantics_decision.md).
 
-```text
-CoDE-style checkpoint
-  -> force a candidate answer
-  -> stop the trial when its outer box closes
-  -> compute BAC over candidate tokens only
-  -> select an upper stopping threshold on calibration data with UCB risk control
-  -> evaluate accuracy, risk, and total generated-token cost on untouched test data
-```
-
-The study will compare the released confidence signal and BAC under the **same**
-upper-threshold risk-control procedure. It does not add semantic redundancy,
-PUMA, ternary quantization, CUSUM, a lower/unsolvable threshold, or another
-stopping signal. Related work and the deliberate boundary are documented in
-[docs/research_overview.md](docs/research_overview.md) and
-[docs/related_work.md](docs/related_work.md). The corrected pre-inference
-design uses 200 deterministically selected MATH500 examples (100 calibration,
-100 untouched test) and operating points `epsilon = 0.15, 0.20`; see
-[docs/protocol_feasibility.md](docs/protocol_feasibility.md).
+M2's terminal classification is **EFFECT NOT CONFIRMED — runtime infeasible**.
+It did not reach its fixed 80-pair requirement or start its BF16 anchor. Any
+future replication must be separately authorized, use a runtime validated by a
+non-benchmark soak test, and use an untouched cohort; it cannot repair or
+rerun M2. P1 remains paused. The retained P1 protocol is historical context,
+not an authorized next action.
 
 ## Repository structure
 
 ```text
-docs/       Research overview, frozen next-study protocol, findings, limits, and resume text
+docs/       Research overview, public protocols/decision records, findings, limits, and resume text
 figures/    One editable conceptual SVG
 results/    Compact aggregate metrics and artifact provenance only
 src/        Reusable audit package and a standard-library result packager
@@ -200,10 +200,11 @@ pinned revisions, and appropriate local hardware; see
 
 This repository does not claim a faithful BF16 reproduction, an end-to-end
 accuracy improvement, a new state of the art, a validated new stopping method,
-a publication or submission, or 79% total inference saving. The completed
-evidence is bounded by the recorded model revision, prompts, datasets,
-checkpoint semantics, quantization formats, and sample sizes. Q4 results must
-not be assumed to generalize to BF16.
+a publication or submission, or 79% total inference saving. M2 did not reach
+a confirmatory conclusion because its Q8 runtime failed. The completed evidence
+is bounded by the recorded model revision, prompts, datasets, checkpoint
+semantics, quantization formats, and sample sizes. Q4 results must not be
+assumed to generalize to BF16.
 
 See [docs/limitations.md](docs/limitations.md) for the full scope and
 [docs/publication_scope.md](docs/publication_scope.md) for the conditional
@@ -223,6 +224,10 @@ paper story.
 - [*From token probabilities to calibrated confidence*](https://arxiv.org/abs/2608.07827),
   2026. Related work only; its calibration methods are not part of the primary
   method.
+- Sun et al. [*Stop When Enough*](https://aclanthology.org/2026.acl-long.1256/),
+  2026. REFRAIN already uses answer-only boxed-region geometric-mean
+  likelihood, so this audit does not claim that score or generic forced-answer
+  stopping as new.
 
 See [CITATION.cff](CITATION.cff) and
 [licenses/UPSTREAM_NOTICES.md](licenses/UPSTREAM_NOTICES.md) for citation and

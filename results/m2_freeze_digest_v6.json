@@ -1,0 +1,21 @@
+{
+  "scope": "M2 confirmatory forced-answer measurement audit",
+  "status": "pre-inference frozen code-bundle digest",
+  "private_freeze_manifest_sha256": "e53f8570e4b897a92838b55d8e9486d1cdcc32ec91ff320999cb6fd5673a99ca",
+  "private_manifest_sha256": "3daceed8a5c2d637397d5a3a8749d06302931755086dcd65d4972fbb9ae5a38f",
+  "public_manifest_digest_sha256": "a28d0a84a8f1dca11018dfab29c4d64c1b363269b3e80e3227c14b0b58c79e00",
+  "preinference_test_result_sha256": "28eec58c7c4935afa25bd45dfd15c909f5cf260670676e786f6884f8d8cda554",
+  "source_file_count": 18,
+  "source_file_index_sha256": "1081e542af3e25bf5b1d4e2e578a6473697104b33bf5d83d67524b87982c8312",
+  "dependency_versions": {
+    "python": {
+      "implementation": "cpython",
+      "version": "3.12.3"
+    },
+    "transformers": "4.51.3",
+    "math_verify": "0.9.0"
+  },
+  "protocol_sha256": "2f18d72ba7eac01b3025a76b133e6aa8d6d07d1b27c7e1e7d82b38e32cba22d8",
+  "literature_gate_sha256": "b754eb5f29b5bdf3f80a5d0e8ec6325b3fe6f5c1ee8a14f4b26bc19f9f8dc4de",
+  "freeze_rule": "The source-file index is authoritative. The run-configuration binding literal is normalized solely to avoid a circular hash."
+}

@@ -13,6 +13,20 @@ replicated the measurement-boundary issue but could not validate BAC’s
 correctness ranking, calibration, final-answer accuracy, or a stopping
 threshold on holdout data.
 
+M1 is a 16-example development-feasibility result. It supports only the
+released-endpoint-versus-candidate-boundary measurement audit stated in its
+decision record. Its frozen analyzer omitted several preregistered descriptive
+outputs, which were not repaired after results existed. The study does not
+establish a new confidence metric, correctness superiority, or threshold
+safety.
+
+M2 did not produce confirmatory evidence. Although its Q8_0 and BF16 load-only
+preflights passed, a Q8 base completion stalled mid-generation below its
+configured context and generation limits. The single-slot server did not
+recover, so the next request timed out. M2 preserved the partial execution but
+fell far short of its 80-valid-pair requirement, and BF16 was not run. This is
+runtime infeasibility, not an estimate of an absent semantic effect.
+
 ## Q7 precision boundary
 
 Q7 held prefixes fixed and compared forced probes. It did not run a full
@@ -30,8 +44,8 @@ stress condition, not evidence about trained ternary models.
 
 BAC is a probability measurement, not a guarantee of correctness. The audit
 found high-confidence wrong candidates, so raw absolute thresholds may be
-dangerously overconfident. The proposed risk-controlled study is not yet a
-result and must not be described as a validated method.
+dangerously overconfident. The retained risk-controlled P1 study is paused and
+must not be described as a validated method or an authorized next experiment.
 
 The Q6 79.37% number is a counterfactual reduction in trial-probe generated
 tokens on that holdout. It is not a 79% total-inference reduction, latency

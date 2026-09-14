@@ -1,0 +1,38 @@
+{
+  "scope": "M2 confirmatory forced-answer measurement audit",
+  "status": "runtime feasibility abort",
+  "terminal_classification": "EFFECT NOT CONFIRMED",
+  "classification_interpretation": "The primary valid-pair minimum was not reached because the pinned Q8_0 runtime became infeasible; this is not an effect-direction estimate.",
+  "freeze_manifest_sha256": "e53f8570e4b897a92838b55d8e9486d1cdcc32ec91ff320999cb6fd5673a99ca",
+  "preflight": {
+    "q8_passed": true,
+    "bf16_passed": true,
+    "completion_requests_issued": 0
+  },
+  "q8_execution": {
+    "planned_selected_examples": 100,
+    "base_records": 9,
+    "base_status_counts": {
+      "completed": 6,
+      "request_error": 2,
+      "interrupted_unknown_outcome": 1
+    },
+    "completed_shared_probes": 18,
+    "primary_valid_pairs": 18,
+    "required_primary_valid_pairs": 80,
+    "unstarted_selected_examples": 91,
+    "base_request_outcome_event_counts": {
+      "http_response": 6,
+      "transport_or_http_error": 2,
+      "intent_without_outcome": 1
+    }
+  },
+  "bf16_anchor_started": false,
+  "preservation": {
+    "failed_or_interrupted_units_retried": false,
+    "failed_or_interrupted_units_replaced": false,
+    "m1_artifacts_modified": false,
+    "additional_benchmark_started": false,
+    "m3_started": false
+  }
+}

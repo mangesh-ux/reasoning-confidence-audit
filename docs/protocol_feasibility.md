@@ -1,5 +1,10 @@
 # Protocol feasibility correction
 
+> **Release status (2026-09-14):** This is an historical P1 pre-inference
+> feasibility record. P1 is frozen and paused at a direct prior-work gate; see
+> [p1_paused_status.md](p1_paused_status.md). The status note does not change
+> the preserved feasibility calculation below.
+
 ## Why the original calibration plan could not work
 
 The first next-study draft proposed 20 calibration examples with `delta = 0.10`
@@ -30,8 +35,8 @@ certified, even if calibration observed no wrong early exits.
 
 ## Pre-inference correction
 
-No MATH500 inference has been run. The design is corrected before execution,
-not after experimental results:
+No **P1** MATH500 inference has been run. The P1 design was corrected before
+its execution, not after P1 experimental results:
 
 - 200 deterministically selected MATH500 examples;
 - 100 calibration and 100 untouched test examples;
@@ -45,5 +50,6 @@ The corrected protocol preserves explicit abort conditions if calibration still
 lacks label variation, has no feasible threshold, fails required monotonicity,
 or cannot produce an evaluable loss table.
 
-The corrected executable plan is in
-[next_study_protocol.md](next_study_protocol.md).
+The corrected historical P1 plan is in
+[next_study_protocol.md](next_study_protocol.md); it is not an authorized
+next experiment.

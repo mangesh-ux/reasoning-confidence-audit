@@ -1,25 +1,32 @@
 # Related work boundary
 
-This is a concise overlap check for the next study, not an open-ended
-literature review.
+This is a concise overlap check for the completed measurement audit and the
+retained, paused P1 protocol, not an open-ended literature review.
 
 ## CoDE-Stop
 
 [CoDE-Stop](https://arxiv.org/abs/2604.04930) supplies the released setting:
 reasoning checkpoints, forced intermediate answers, token-probability
-confidence, and confidence-dynamics stopping. The completed Q0–Q7 work audits
-the measurement boundary in its released probe path. The public repository
-credits the upstream paper and implementation; it does not redistribute or
-modify them.
+confidence, and confidence-dynamics stopping. Q0–Q7 and M1 audit the
+measurement boundary in its released probe path. The public repository credits
+the upstream paper and implementation; it does not redistribute or modify them.
+
+## REFRAIN / Stop When Enough
+
+[Stop When Enough](https://aclanthology.org/2026.acl-long.1256/) explicitly
+uses length-normalized likelihood over answer tokens inside a boxed region.
+It rules out any claim that answer-only boxed-region geometric-mean likelihood,
+or a generic forced-answer stopping method built around it, is new here.
+REFRAIN does not provide the same paired audit of the pinned CoDE-Stop terminal
+token behavior, 21-token cap, released denominator, and exact outer-box
+boundary on a shared greedy trace.
 
 ## Conformal Thinking
 
 [Conformal Thinking](https://arxiv.org/abs/2602.03814) provides the closest
-decision-rule reference. Its upper-threshold loss and UCB procedure motivate
-the frozen next-study controller. The proposed integration is deliberately
-narrow: candidate-boundary token confidence is paired with that upper-only
-controller. It does not adopt the paper’s lower/unsolvable threshold or claim
-to reproduce its full method.
+decision-rule reference. Its upper-threshold loss and UCB procedure motivated
+the retained P1 controller. P1 is paused at a direct prior-work gate; it is not
+an authorized next experiment or a claim to reproduce the paper's full method.
 
 ## PUMA / Stop When Reasoning Converges
 
@@ -38,10 +45,11 @@ merged into the primary method in this study.
 
 ## Novelty/overlap conclusion
 
-Among these specifically reviewed works, no paper was identified that
-implements the exact pairing of candidate-boundary token confidence and a
-risk-controlled adaptive reasoning threshold. Conformal Thinking is the
-closest overlap because it already supplies risk-controlled confidence-based
-reasoning decisions. This conclusion is limited to the cited works; any
-directly overlapping prior implementation found later must be documented
-prominently rather than hidden.
+REFRAIN and Conformal Thinking close broad novelty claims about answer-only
+likelihood, forced-answer stopping, and risk-controlled reasoning. M1 and M2
+are restricted to a narrower question: whether the pinned released CoDE-Stop
+endpoint and score semantics differ from an exact candidate boundary on a
+shared trace. M2's bounded pre-inference recheck found no public artifact that
+already performs that exact audit. This conclusion is limited to the cited
+works; any directly overlapping prior implementation found later must be
+documented prominently rather than hidden.

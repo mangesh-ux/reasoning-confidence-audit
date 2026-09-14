@@ -68,13 +68,37 @@ helpers. Its tests use synthetic fixtures only. The package does not contain
 private Q0–Q7 traces, benchmark rows, upstream source, model weights, or an
 automatic inference runtime.
 
-## Next study
+## M1 feasibility and M2 confirmation attempt
 
-The proposed risk-controlled study is intentionally separate from the completed
+M1 was intentionally separate from Q0–Q7: a preregistered 16-example Q8_0
+measurement-semantics feasibility study using shared greedy traces. Its A
+condition reconstructed the released terminal behavior and score; its B
+condition stopped at a matching outer-box boundary and scored the predeclared
+candidate-token span. The shared trace isolates endpoint semantics from
+rollout variation. The full result boundary, including omitted frozen-analyzer
+descriptives, is in the
+[M1 terminal decision](m1_forced_answer_measurement_semantics_decision.md).
+
+M2 then froze a new 100-example confirmatory measurement/reproducibility
+protocol before model completion. It fixed the Q8_0 runtime, 4096-token
+context, 2048-token base cap, 21-token probe cap, release-coordinate
+checkpoints, parser, score definitions, thresholds, clustered bootstrap, and
+12-row BF16 anchor. Its complete frozen public protocol and literature gate
+are [here](m2_confirmatory_measurement_protocol.md) and
+[here](m2_confirmatory_literature_gate.md).
+
+M2's load-only preflights did not exercise a completion. During the primary
+run, a Q8 base completion stalled below its configured context and generation
+limits. Because the single-slot server did not recover, the next request timed
+out downstream. The design ended with 18 valid pairs, below its 80-pair
+criterion, and no BF16 anchor. The result is recorded as runtime infeasible,
+not as a semantic-effect estimate, in the
+[abort record](m2_runtime_feasibility_abort.md).
+
+## Paused P1 protocol
+
+The risk-controlled P1 protocol is intentionally separate from the completed
 audit. Its pre-specified data split, runtime, loss, UCB procedure, abort rules,
 and reporting requirements are in
-[next_study_protocol.md](next_study_protocol.md). Its original 20-example
-calibration plan was corrected before inference because it could not certify
-the original risk targets; the calculation is preserved in
-[protocol_feasibility.md](protocol_feasibility.md). The corrected study has not
-been executed.
+[next_study_protocol.md](next_study_protocol.md). It is paused at a direct
+prior-work gate and is not an authorized next study.

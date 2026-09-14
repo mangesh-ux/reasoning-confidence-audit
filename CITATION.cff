@@ -2,11 +2,11 @@ cff-version: 1.2.0
 message: "If you use this audit release, cite it together with the upstream CoDE-Stop paper."
 title: "Reasoning Confidence Audit: Reproducing and Stress-Testing Confidence-Based Early Stopping in Reasoning LLMs"
 type: software
-version: "2026.09"
-date-released: 2026-09-10
+version: "2026.09.14"
+date-released: 2026-09-14
 authors:
   - name: "Reasoning Confidence Audit contributors"
-abstract: "A compact public release for a frozen Q0-Q7 audit of CoDE-Stop confidence measurement semantics and fixed-prefix precision fidelity, plus an unrun risk-controlled next-study protocol."
+abstract: "A compact public release for a frozen Q0-Q7 audit of CoDE-Stop confidence measurement semantics and fixed-prefix precision fidelity, a completed M1 measurement-semantics feasibility study, and M2's transparent runtime-feasibility abort."
 keywords:
   - reasoning models
   - early stopping
@@ -41,3 +41,7 @@ references:
     title: "From token probabilities to calibrated confidence"
     year: 2026
     url: "https://arxiv.org/abs/2608.07827"
+  - type: article
+    title: "Stop When Enough"
+    year: 2026
+    url: "https://aclanthology.org/2026.acl-long.1256/"

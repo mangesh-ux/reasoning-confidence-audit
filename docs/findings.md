@@ -56,9 +56,49 @@ negative result, not as a comparison to BitNet-style trained ternary models.
 The compact values are in
 [results/q7_precision_summary.json](../results/q7_precision_summary.json).
 
+## ESTABLISHED, NARROWLY: M1 forced-answer measurement semantics
+
+M1 was a separately preregistered 16-example Qwen3-4B Q8_0
+development-feasibility study. It completed 47 available shared forced-answer
+rollouts; 44 had a closed candidate boundary and passed the paired-integrity
+invariant. The released endpoint continued after that boundary in 44/44 valid
+pairs. The median absolute `c_full`-minus-boundary-score difference was 0.119,
+and 34/44 pairs had an absolute difference of at least 0.05.
+
+At strict illustrative thresholds 0.70, 0.80, 0.90, and 0.95, first-crossing
+decisions differed in 2, 7, 13, and 10 of 15 eligible examples. Endpoint
+accounting was 783 released-policy-prefix tokens versus 223 boundary-policy-
+prefix tokens (B/A = 28.48%). Because A and B came from a shared rollout,
+this is not a realized in-run saving, total-task saving, latency result, or
+energy result.
+
+The favorable M1 feasibility gate supports only a code-to-paper
+measurement-audit manuscript path. Its frozen analyzer did not emit several
+promised descriptives, including aggregate candidate agreement, the endpoint-
+denominator diagnostic, rank correlation, and timing aggregates; these were
+not backfilled after outcomes existed. See the
+[M1 terminal decision](m1_forced_answer_measurement_semantics_decision.md)
+and [public aggregate digest](../results/m1_result_digest.json).
+
+## NOT CONFIRMED: M2 confirmatory audit
+
+M2 fixed a fresh 100-example cohort and all primary outcomes before inference.
+Both precision load-only preflights passed. A Q8_0 base completion then stalled
+mid-generation below the configured context and generation limits; the
+single-slot server did not recover, and the next request timed out downstream.
+The run preserved six completed bases, 18 primary-valid paired checkpoints,
+two timed-out bases, and one interrupted-unknown intent. The remaining 91
+selected examples were unstarted, and the predeclared BF16 anchor was not run.
+
+The fixed minimum was 80 primary-valid pairs, so M2 is **EFFECT NOT CONFIRMED
+— runtime infeasible**. This is not evidence for absence of the measurement
+effect and cannot be pooled with M1. No request was retried or replaced. See
+the [M2 abort record](m2_runtime_feasibility_abort.md).
+
 ## Not established
 
 The completed audit does not establish that BAC improves final-answer accuracy,
 that any absolute BAC threshold is safe, that Q4 generalizes to BF16, or that a
-new stopping policy improves end-to-end cost. Those are questions for the
-unrun protocol in [next_study_protocol.md](next_study_protocol.md).
+new stopping policy improves end-to-end cost. P1 remains paused; M2 did not
+reach a confirmatory result. Any future empirical study requires a new,
+separately authorized protocol.

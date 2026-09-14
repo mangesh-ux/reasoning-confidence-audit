@@ -1,0 +1,120 @@
+{
+  "scope": "M1 preregistered forced-answer measurement-semantics feasibility",
+  "artifact_kind": "public-safe aggregate result digest",
+  "status": "completed",
+  "terminal_decision": "Measurement-paper path justified",
+  "decision_date": "2026-09-13",
+  "data": {
+    "repository": "HuggingFaceH4/MATH-500",
+    "revision": "2343f79f3640c0f795bbf4e3234396cfe9266d0f",
+    "source_file_sha256": "35dc41080a3680858b27fa7e0533d2d547825316fc5dafe5d316f4ccc5a06132",
+    "selection_method": "M1_FORCED_ANSWER_MEASUREMENT_SEMANTICS_V1 deterministic pre-output ranking",
+    "selected_example_count": 16,
+    "private_manifest_sha256": "f8993979491579391fae2e8f6f2e1e2f4de6d62dc37f403141fc8220c65a7e43"
+  },
+  "runtime": {
+    "model": "Qwen3-4B Q8_0",
+    "model_sha256": "0d5964f2837d157bf8d845f09b006254b85389ef4293ec0f41dd8ffeab1ab3f0",
+    "tokenizer_revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "llama_cpp_source_revision": "7798007a29a90e3053e799394da48cf53a2f8e0f",
+    "n_ctx": 4096,
+    "all_model_layers_on_gpu": true,
+    "checkpoint_positions_release_coordinate": [
+      512,
+      1024,
+      1536
+    ],
+    "maximum_probe_tokens": 21
+  },
+  "provenance": {
+    "passing_preflight": {
+      "status": "passed",
+      "completion_requests": 0,
+      "artifact_sha256": "9d4a1945187c92d5d1c69fb35786969e2aa802cf9e4e98e2d33fef64d4e33eaf"
+    },
+    "completed_run_summary_sha256": "5e8d091b6b776fa5a77fc00f4e464896361ce0556f3328b5fb474f4c2a03678d",
+    "analysis_output_sha256": "50465875eee903c6c23ffe7a8ad794b0bbdbe6965bcb8285917b542b79846642",
+    "base_request_intents_and_outcomes": {
+      "intents": 16,
+      "outcomes": 16,
+      "unmatched_or_retried": 0
+    },
+    "probe_request_intents_outcomes_and_derived_tokens": {
+      "intents": 846,
+      "outcomes": 846,
+      "derived_tokens": 846,
+      "unmatched_or_retried": 0
+    }
+  },
+  "completion_and_missingness": {
+    "base_trajectories_completed": 16,
+    "available_paired_rollouts_completed": 47,
+    "otherwise_possible_checkpoint_unavailable_due_to_short_base": 1,
+    "valid_A_B_integrity_pairs": 44,
+    "completed_rollouts_without_closed_B_boundary": 3,
+    "replacements": 0
+  },
+  "paired_measurement_outcomes": {
+    "continuation_after_B_close": {
+      "count": 44,
+      "denominator_valid_pairs": 44,
+      "median_A_tokens": 17.0,
+      "mean_A_tokens": 12.727272727272727
+    },
+    "absolute_c_full_minus_BAC": {
+      "count": 44,
+      "median": 0.11923579123771044,
+      "mean": 0.13742667908006745,
+      "at_least_0_05_count": 34
+    },
+    "illustrative_first_crossing_disagreements": {
+      "comparison": "strict greater-than at fixed thresholds; not calibrated policy",
+      "eligible_examples_at_each_threshold": 15,
+      "0.70": 2,
+      "0.80": 7,
+      "0.90": 13,
+      "0.95": 10
+    },
+    "policy_prefix_tokens": {
+      "A_total": 783,
+      "B_total": 223,
+      "B_to_A_ratio": 0.2848020434227331,
+      "interpretation_limit": "Shared-rollout endpoint accounting only; not total task cost, latency, energy, or an observed in-run token saving."
+    }
+  },
+  "correctness_descriptives": {
+    "evaluator": "math_verify 0.9.0 with fixed outer 15-second worker timeout",
+    "evaluable_pairs": 38,
+    "correct": 22,
+    "incorrect": 16,
+    "not_evaluable_empty_parse": 6,
+    "claim_boundary": "Descriptive feasibility only; no correctness, calibration, or safe-threshold superiority claim."
+  },
+  "automatic_feasibility_gate": {
+    "criterion_1_valid_pairs_at_least_24": true,
+    "criterion_2_continuation_coverage": true,
+    "criterion_3_at_least_two_practical_effects": true,
+    "criterion_4_B_to_A_policy_prefix_tokens_at_most_75_percent": true,
+    "criterion_5_literature_revalidated_by_human": true
+  },
+  "literature_scope": {
+    "revalidated_date": "2026-09-13",
+    "newly_recorded_constraint": "ACL 2026 REFRAIN already uses answer-only boxed-region geometric-mean likelihood; M1 cannot claim a novel answer-only score or stopping method.",
+    "residual_question": "Pinned CoDE-Stop released-code endpoint/score semantics versus the paired exact candidate boundary under a shared rollout.",
+    "condition_C": "Non-executable from publicly available Conformal Thinking rollout semantics."
+  },
+  "unreported_preregistered_descriptives": [
+    "aggregate A/B exact-candidate-agreement summary",
+    "c_boundary_release_denominator diagnostic",
+    "paired score rank correlation",
+    "shared-trace token and timing aggregates",
+    "paired percentage policy-prefix reduction"
+  ],
+  "nonclaims": [
+    "No novel confidence metric or generic forced-answer stopping method.",
+    "No safe absolute threshold or risk-control result.",
+    "No end-to-end total-token, latency, energy, accuracy, or cross-model claim.",
+    "No authorization to resume P1 or run additional model inference."
+  ],
+  "public_release_guard": "This digest excludes raw benchmark rows, selected-row identities, prompts, reasoning traces, token sequences, model outputs, binaries, secrets, and machine-specific paths. A separate public-release audit is required before release."
+}

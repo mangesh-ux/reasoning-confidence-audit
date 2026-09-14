@@ -4,12 +4,11 @@
 
 This repository records a completed Q0–Q7 reproduction and audit of the
 released [CoDE-Stop](https://github.com/sudoparsa/CoDE-Stop) confidence
-measurement path. It then freezes one unrun follow-up study:
+measurement path, a completed M1 Q8_0 measurement-semantics feasibility
+study, and M2's runtime-feasibility abort. The older risk-controlled P1
+protocol remains frozen and paused at its direct prior-work gate.
 
-> **Boundary-Aligned Confidence under Risk-Controlled Early Stopping**
-
-The follow-up is a protocol, not a result. Nothing in this repository claims a
-validated replacement for CoDE-Stop.
+Nothing in this repository claims a validated replacement for CoDE-Stop.
 
 ## Completed audit
 
@@ -38,11 +37,42 @@ The completed evidence has three distinct statuses:
   candidate agreement between Q8 and BF16 than between Q4 and BF16. Q4 remains
   a discovery backend, not a final-validation proxy.
 
-## Frozen next direction
+## M1 measurement-semantics feasibility
 
-The next study isolates one question: whether an audited candidate-boundary
-confidence signal behaves more safely when the decision threshold is chosen
-with an upper-risk controller on labeled calibration data.
+M1 used a preregistered 16-example Qwen3-4B Q8_0 development-feasibility
+cohort and shared greedy forced-answer traces. Of 47 completed rollouts, 44
+were valid paired A/B endpoint comparisons. In all 44, the released endpoint
+continued after the matching outer-box candidate boundary; the median absolute
+score difference was 0.119 and the B/A policy-prefix-token ratio was 28.48%.
+
+These are paired measurement and endpoint-accounting results only. They do
+not establish a new score, correctness superiority, calibration, a safe
+threshold, total cost saving, or a deployed stopping policy. The M1
+[terminal decision](m1_forced_answer_measurement_semantics_decision.md)
+records both the favorable feasibility gate and its immutable reporting
+limitations.
+
+## M2 confirmatory measurement audit
+
+M2 independently froze a 100-example MATH-500 cohort, Q8_0 runtime, greedy
+probe path, released terminal behavior, 21-token cap, score definitions, and
+fixed confirmation criteria before inference. It did not modify M1 or reopen
+P1. Both Q8_0 and BF16 load-only preflights passed, but a Q8 base completion
+stalled mid-generation below the configured context and generation limits.
+The single-slot server did not recover, so the next base request timed out.
+
+Only 18 primary-valid pairs were produced, versus the fixed minimum of 80;
+the BF16 anchor never started. M2 is therefore **EFFECT NOT CONFIRMED — runtime
+infeasible**, not evidence that the semantic effect is absent. Its
+[frozen protocol](m2_confirmatory_measurement_protocol.md),
+[literature gate](m2_confirmatory_literature_gate.md), and
+[abort record](m2_runtime_feasibility_abort.md) are public.
+
+## Paused P1 direction
+
+The retained P1 protocol isolates one question: whether an audited
+candidate-boundary confidence signal behaves more safely when the decision
+threshold is chosen with an upper-risk controller on labeled calibration data.
 
 ```text
 checkpoint -> forced candidate -> candidate boundary -> BAC
@@ -52,23 +82,19 @@ checkpoint -> forced candidate -> candidate boundary -> BAC
                                  untouched-test accuracy / risk / cost
 ```
 
-The paired comparison uses the same risk-control procedure for the released
-full-span signal (`c_full`) and BAC. Their intended difference is the signal
-and probe boundary only. The first study uses no lower/unsolvable threshold,
-semantic redundancy, PUMA mechanism, ternary condition, CUSUM, or extra
-stopping signal. Full details are in
+The paired comparison would use the same risk-control procedure for the
+released full-span signal (`c_full`) and BAC. Their intended difference is the
+signal and probe boundary only. The study is paused and is not an authorized
+next action. Full historical details are in
 [next_study_protocol.md](next_study_protocol.md).
 
 ## Related work and overlap boundary
 
-[Conformal Thinking](https://arxiv.org/abs/2602.03814) is the closest related
-work. It provides a risk-controlled upper-threshold formulation for
-confidence-based reasoning decisions and is the source for the proposed UCB
-selection procedure. Its forced-answer confidence is not the same as this
-audit’s candidate-boundary token span: this work ends at the completed outer
-box and scores only the pre-specified candidate tokens. The next study is an
-upper-threshold-only application, not a reproduction of Conformal Thinking’s
-full dual-threshold method.
+[Conformal Thinking](https://arxiv.org/abs/2602.03814) is the closest
+decision-rule reference for P1. It provides a risk-controlled upper-threshold
+formulation for confidence-based reasoning decisions. The paused protocol is
+an upper-threshold-only application, not a reproduction of its full
+dual-threshold method.
 
 [PUMA / Stop When Reasoning Converges](https://arxiv.org/abs/2605.17672)
 studies reasoning-level semantic convergence and combines redundancy with
@@ -81,15 +107,17 @@ motivates caution in interpreting raw probability magnitude as correctness. It
 may become a baseline or reference, but its calibration methods are not merged
 into the primary method.
 
-Within these specifically reviewed works, no paper was identified that
-implements the exact combination of candidate-boundary token confidence and a
-risk-controlled adaptive reasoning threshold. This is a narrow overlap check,
-not an exhaustive literature claim. If a direct prior implementation is found,
-the study should report the conflict and narrow its contribution accordingly.
+REFRAIN's answer-only boxed-region likelihood rules out a claim that the score
+or generic forced-answer stopping is novel. M1 and M2 are instead restricted
+to the reproducible question of how the pinned released CoDE-Stop endpoint and
+score semantics differ from an exact candidate boundary on a shared trace.
+M2's bounded recheck found no public artifact that already performs that exact
+audit. This is a narrow overlap check, not an exhaustive literature claim.
 
 ## What this project does not claim
 
 The audit does not establish a faithful BF16 reproduction, end-to-end accuracy
 improvement, a safe absolute BAC threshold, a new state of the art, or a
-published/accepted method. The final paper contribution depends on the next
-study completing without violating its preregistered abort conditions.
+published/accepted method. M1 justifies a narrow measurement-audit manuscript
+path; M2 does not supply a confirmatory result because its runtime was
+infeasible.
