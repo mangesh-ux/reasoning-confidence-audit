@@ -15,6 +15,11 @@ It may:
    a measurement instrument, not a novel score or controller.
 5. Transparently report M2's runtime-feasibility abort and its absence of a
    confirmatory conclusion.
+6. Report L1's version-pinned, synthetic equation-to-execution audit as a
+   formal reproducibility finding: the released default degeneration path is
+   mathematically a recency-weighted count of strict drops in floor-clamped
+   log confidence, with separate warm-up, ramp, terminal-gate, and
+   strict-comparator semantics.
 
 ## Evidence boundary
 
@@ -31,6 +36,11 @@ M2's 100-example confirmation protocol did not reach its 80-valid-pair
 minimum after the Q8 runtime stalled. It must be reported as runtime
 infeasibility, not as a positive result, a null result, or a basis to alter
 the M2 protocol.
+
+L1 is non-empirical. Its synthetic fixtures establish formal distinctions in
+the named pinned release, not an empirical change in decisions, confidence,
+cost, calibration, accuracy, or safety. It cannot be used to describe a
+changed equation as an improved CoDE-Stop plug-in.
 
 ## Relationship to prior work
 

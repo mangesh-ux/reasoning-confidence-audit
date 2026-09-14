@@ -22,6 +22,11 @@ it does not contain a model runner or private experiment artifacts.
   and has no hard-coded path, port, model, or artifact location.
 - `metrics.py` contains compact helpers for normalized candidate agreement,
   paired confidence comparisons, and probe-token accounting.
+- `codestop_equations.py` is an isolated, synthetic-only reconstruction of the
+  version-pinned released forced-answer score, degeneration, ramp, cap,
+  terminal-membership, and stop expressions. Its comparison switches are
+  source-audit instruments, not alternative stopping methods. See the
+  [L1 decision record](../docs/l1_equation_to_execution_decision.md).
 
 There are two deliberate parser modes. `find_first_boxed_boundary` uses the
 offline audit convention that ignores escaped braces. The forced-probe parser

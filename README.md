@@ -129,6 +129,14 @@ non-benchmark soak test, and use an untouched cohort; it cannot repair or
 rerun M2. P1 remains paused. The retained P1 protocol is historical context,
 not an authorized next action.
 
+L1 is a completed, no-model equation-to-execution audit of the same pinned
+release. Its synthetic fixtures confirm that the released default degeneration
+path is a recency-weighted count of strict drops in floor-clamped log
+confidence, rather than an independently active log-space instability
+criterion. This is a formal reproducibility observation—not evidence that an
+altered equation improves stopping. See the [frozen L1 protocol](docs/l1_equation_to_execution_protocol.md)
+and [decision record](docs/l1_equation_to_execution_decision.md).
+
 ## Repository structure
 
 ```text
@@ -148,6 +156,8 @@ from the frozen experiments:
 
 - candidate-boundary detection with nested-brace handling;
 - released full-span confidence reconstruction and BAC;
+- version-pinned, synthetic-only reconstructions of released CoDE-Stop score,
+  degeneration, ramp, cap, terminal-membership, and stop expressions;
 - released-style checkpoint membership handling;
 - a manually configured, greedy local llama.cpp `/completion` probe that stops
   at the candidate boundary; and
