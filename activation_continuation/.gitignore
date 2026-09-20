@@ -1,0 +1,31 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+configs/*.local.*
+
+# Never stage private runtime evidence if an execution path is accidentally
+# pointed at this repository instead of the caller-supplied Drive root.
+*.acrq
+*.safetensors
+*.safetensors.index.json
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.trace
+*.trace.json
+*.raw.json
+qualification_ledger.jsonl
+completion_ledger.jsonl
+trajectory_checkpoints/
+qualification/
+private_study/
+provenance/
+
+# Qualification evidence can include private activations and locally generated text.
+runtime_qualification/runs/
+private_data/
+private_results/
+activations/
+trajectories/
+model_cache/

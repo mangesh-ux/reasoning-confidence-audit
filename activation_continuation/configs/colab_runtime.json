@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "study_id": "activation-continuation-v1",
+  "model": {
+    "repo_id": "Qwen/Qwen3-1.7B",
+    "revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+    "tokenizer_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+    "trust_remote_code": false,
+    "dtype": "bfloat16"
+  },
+  "generation": {
+    "thinking_mode": true,
+    "do_sample": true,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0.0,
+    "max_new_tokens": 4096
+  },
+  "qualification": {
+    "run_id": "qwen3-1.7b-bf16-synthetic-v1",
+    "cycles_per_case": 3,
+    "activation_layers": null,
+    "minimum_vram_gib": 16,
+    "minimum_free_disk_gib": 30,
+    "memory_growth_tolerance_mib": 512
+  },
+  "artifacts": {
+    "model_cache_dir": "model_cache",
+    "qualification_dir": "qualification",
+    "private_study_dir": "private_study",
+    "public_safe_dir": "public_safe",
+    "provenance_dir": "provenance"
+  },
+  "runtime_lock": {
+    "python_major_minor": "3.12",
+    "torch_cuda_build": "12.8",
+    "packages": {
+      "accelerate": "1.12.0",
+      "datasets": "3.6.0",
+      "huggingface-hub": "0.36.2",
+      "latex2sympy2_extended": "1.11.0",
+      "math-verify": "0.9.0",
+      "numpy": "2.5.2",
+      "packaging": "26.3",
+      "safetensors": "0.8.0",
+      "sympy": "1.14.0",
+      "tokenizers": "0.21.4",
+      "torch": "2.9.1+cu128",
+      "transformers": "4.51.3"
+    }
+  },
+  "prior_local_runtime_failure": {
+    "source_document": "activation_continuation/docs/a1_runtime_qualification.md",
+    "classification": "compute_infeasible_current_codemax_environment",
+    "statement": "The local Codex runtime could not access CUDA. This is an environment limitation, not a scientific conclusion."
+  },
+  "benchmark_gate": {
+    "manifest_path": "activation_continuation/manifests/study_manifest.json",
+    "require_qualification_pass": true,
+    "default_run_benchmark": false
+  }
+}

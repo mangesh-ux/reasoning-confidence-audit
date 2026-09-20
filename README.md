@@ -146,8 +146,28 @@ results/    Compact aggregate metrics and artifact provenance only
 src/        Reusable audit package and a standard-library result packager
 tests/      Synthetic offline tests; no model, GPU, dataset, or network required
 examples/   A small synthetic released-span-versus-boundary demo
+activation_continuation/  Drive-backed Colab runtime qualification package; no benchmark runner
 licenses/   Upstream-license and attribution notices
 ```
+
+## Colab activation-continuation handoff
+
+`activation_continuation/` is a separate, frozen pre-benchmark execution
+package for a controlled activation-continuation validity study. It preserves
+the earlier local CUDA failure as an environment limitation, not a scientific
+result. The package does not alter Q0–Q7, M1, M2, L1, or the paused P1 study.
+
+The thin [Colab notebook](activation_continuation/notebooks/colab_runner.ipynb)
+clones an exact reviewed commit, installs a fully pinned environment, records
+the GPU/runtime identity, verifies the pinned Qwen3-1.7B revision, and runs a
+synthetic qualification with immediate Drive-backed checkpoints. It stops on
+any failure and intentionally contains no benchmark runner. See the exact
+[Colab workflow](activation_continuation/docs/colab_execution.md).
+
+Private model snapshots, hidden activations, generated text, benchmark
+material, and Drive-specific paths are excluded from this repository. A
+passing qualification is only a runtime result; it does not authorize
+benchmark generation.
 
 ## Core implementation
 
