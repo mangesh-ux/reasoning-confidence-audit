@@ -1,6 +1,16 @@
 # Reasoning Confidence Audit
 
-## Reproducing and Stress-Testing Confidence-Based Early Stopping in Reasoning LLMs
+> **A source-pinned audit of forced-answer confidence boundaries**
+
+> **The central question:** once a reasoning model has written a candidate
+> answer, what text is its confidence signal actually judging?
+
+> [!IMPORTANT]
+> **Bottom line.** In the audited CoDE-Stop paths, a released forced-answer
+> endpoint can include tokens generated after a candidate answer has closed.
+> This repository documents that scoped measurement-boundary fact. It does
+> **not** establish a new score, a safe stopping threshold, an accuracy gain,
+> or an end-to-end compute saving.
 
 This repository is a compact, public audit of confidence-based early stopping
 for reasoning language models. It examines the released
@@ -10,7 +20,7 @@ and records M2's preregistered runtime-feasibility abort. It contains no model
 weights, raw reasoning traces, raw token-logprob traces, benchmark rows, or
 upstream source code.
 
-## What this project studies
+## The research question
 
 The completed audit asks:
 
@@ -23,6 +33,15 @@ separate risk-controlled P1 protocol remains frozen and paused at a
 prior-work gate. M2 was a distinct, preregistered measurement/reproducibility
 attempt; it stopped for a runtime failure before its confirmation threshold.
 
+## A 30-second tour
+
+| If you want to understand… | Start here |
+| --- | --- |
+| The candidate-only versus mixed-span distinction | [The measurement boundary](#the-measurement-boundary) |
+| What the frozen evidence supports—and does not | [Evidence at a glance](#evidence-at-a-glance) |
+| The synthetic, reusable audit code | [Core implementation](#core-implementation) |
+| The separate Colab runtime qualification | [Colab handoff](#separate-colab-qualification-handoff) |
+
 ## Why confidence-based early stopping matters
 
 Reasoning models can spend many tokens continuing after they have enough
@@ -32,7 +51,7 @@ decision. This audit asks whether the released probe confidence is measuring
 the candidate answer alone or a mixture of the answer and text generated after
 it.
 
-## What we reproduced
+## What was audited
 
 [CoDE-Stop](https://arxiv.org/abs/2604.04930) samples designated reasoning
 checkpoints, forces a candidate answer, turns greedy token probabilities into a
@@ -46,9 +65,20 @@ faithful BF16 reproduction. See [docs/methodology.md](docs/methodology.md) and
 [docs/experiment_timeline.md](docs/experiment_timeline.md) for the frozen
 sequence.
 
-## What we found
+## Evidence at a glance
 
-### ESTABLISHED OBSERVATIONS
+| Track | What the frozen evidence supports | Boundary of that evidence |
+| --- | --- | --- |
+| Q3 / Q6 | In the studied Q4_K_M batches, the released span can extend past a completed candidate answer. | Q6 correctness ranking was not evaluable. |
+| Q7 | Q8_0 matched BF16 candidate identity more often than Q4_K_M on fixed prefixes. | This is not full-model fidelity. |
+| M1 | Paired released-endpoint and candidate-boundary measurements differed in a 16-example development-feasibility study. | It is not a new score, controller, or realized end-to-end saving. |
+| M2 | The planned confirmation threshold was not reached because the Q8_0 runtime stalled. | **Effect not confirmed — runtime infeasible**, not a null result. |
+| L1 | The pinned released equation semantics are formally reproducible with synthetic fixtures. | Formal and non-empirical only. |
+
+The detailed records below preserve the same boundaries rather than smoothing
+them into a broader performance claim.
+
+### Established observations
 
 - In the studied Q4 batches, released probes often continued after a candidate
   answer had already closed. That post-answer text was included in the released
@@ -65,14 +95,14 @@ sequence.
   threshold differences support only a narrow measurement-audit paper path,
   not a new score, safe threshold, or realized end-to-end saving.
 
-### EXPLORATORY OBSERVATIONS
+### Exploratory observations
 
 - In the Q3 development batch, Boundary-Aligned Confidence (BAC) ranked
   candidate correctness much more strongly than the released full-span signal.
 - Q6 contained zero correct probe candidates, so that ranking could not be
   evaluated on the holdout.
 
-### CONFIRMATORY STATUS
+### Confirmatory status
 
 - M2 froze a new 100-example Q8_0 confirmatory measurement audit and passed
   load-only Q8_0/BF16 preflights. It then stopped after 18 primary-valid pairs,
@@ -86,6 +116,14 @@ sequence.
 BAC is the standard geometric mean of the pre-specified candidate-answer token
 probabilities, stopping at the matching outer `\boxed{...}` close. No
 post-box token is included.
+
+```text
+released measurement:  candidate answer  →  later continuation  →  c_full
+boundary measurement:  candidate answer                       →  BAC
+```
+
+BAC is a local descriptive label for this boundary calculation, not a novelty
+claim or a deployed stopping policy.
 
 ![Conceptual comparison of released and boundary-aligned probes](figures/boundary_aligned_probe.svg)
 
@@ -114,7 +152,7 @@ or BAC comparison. It is not treated as a BitNet-style trained ternary model.
 See [docs/findings.md](docs/findings.md) and the compact
 [Q7 result](results/q7_precision_summary.json).
 
-## Current status
+## Research ledger
 
 M1's terminal decision is **Measurement-paper path justified**: a paper can
 audit the named released forced-answer endpoint and score semantics against an
@@ -150,7 +188,7 @@ activation_continuation/  Drive-backed Colab runtime qualification package; no b
 licenses/   Upstream-license and attribution notices
 ```
 
-## Colab activation-continuation handoff
+## Separate Colab qualification handoff
 
 `activation_continuation/` is a separate, frozen pre-benchmark execution
 package for a controlled activation-continuation validity study. It preserves
@@ -163,6 +201,13 @@ the GPU/runtime identity, verifies the pinned Qwen3-1.7B revision, and runs a
 synthetic qualification with immediate Drive-backed checkpoints. It stops on
 any failure and intentionally contains no benchmark runner. See the exact
 [Colab workflow](activation_continuation/docs/colab_execution.md).
+
+> [!WARNING]
+> The frozen runtime requires native BF16 and at least **16 GiB detected
+> VRAM**. Prefer an **L4**, **A100**, or **H100**; the preflight remains the
+> authoritative hardware decision. A **T4** is not an eligible target because
+> it lacks native BF16 support. Do not switch the configuration to FP16, lower
+> the resource gate, or continue to benchmark generation after a failure.
 
 Private model snapshots, hidden activations, generated text, benchmark
 material, and Drive-specific paths are excluded from this repository. A
@@ -226,7 +271,7 @@ inference rerun requires the upstream repositories, model and dataset terms,
 pinned revisions, and appropriate local hardware; see
 [docs/environment.md](docs/environment.md).
 
-## Limitations
+## What this repository does not show
 
 This repository does not claim a faithful BF16 reproduction, an end-to-end
 accuracy improvement, a new state of the art, a validated new stopping method,
