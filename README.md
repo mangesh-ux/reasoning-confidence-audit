@@ -1,308 +1,283 @@
 # Reasoning Confidence Audit
 
-> **A source-pinned audit of forced-answer confidence boundaries**
+> An audit tied to an exact upstream
+> [CoDE-Stop commit](https://github.com/sudoparsa/CoDE-Stop/tree/b5081e7c2abe23bb1d19649421cc13522fee7c50),
+> asking how it measures confidence after requesting an answer.
 
-> **The central question:** once a reasoning model has written a candidate
-> answer, what text is its confidence signal actually judging?
+## In one paragraph
 
-> [!IMPORTANT]
-> **Bottom line.** In the audited CoDE-Stop paths, a released forced-answer
-> endpoint can include tokens generated after a candidate answer has closed.
-> This repository documents that scoped measurement-boundary fact. It does
-> **not** establish a new score, a safe stopping threshold, an accuracy gain,
-> or an end-to-end compute saving.
+This repository asks a narrow reproducibility question: when a released
+early-stopping implementation asks a reasoning model for an answer and turns
+the generated token probabilities into a confidence-like score, **which text
+does that score actually describe?** In the audited CoDE-Stop revision, the
+answer-producing continuation can continue after the first complete boxed
+answer. Its released score can therefore include both that first boxed answer
+and later generated continuation. This repository compares that released
+measurement span with a span ending at the completed boxed answer. Its
+completed record combines offline accounting of previously recorded,
+unmodified traces with a controlled comparison that repeats the same
+deterministic generation. It is a
+measurement-semantics audit—not a new confidence metric, stopping controller,
+calibration method, accuracy result, or demonstrated end-to-end saving.
 
-This repository is a compact, public audit of confidence-based early stopping
-for reasoning language models. It examines the released
-[CoDE-Stop](https://github.com/sudoparsa/CoDE-Stop) measurement path, packages
-aggregate evidence from the completed Q0–Q7 sandbox and M1 feasibility study,
-and records M2's preregistered runtime-feasibility abort. It contains no model
-weights, raw reasoning traces, raw token-logprob traces, benchmark rows, or
-upstream source code.
+The public release contains aggregate results, exact revision identifiers,
+protocols, synthetic tests, and reusable parsing/scoring utilities. It intentionally
+excludes model weights, benchmark rows, raw reasoning traces, raw token
+log-probability traces, binaries, and upstream source code.
 
-## The research question
+## Core terms
 
-The completed audit asks:
+The following project-specific terms are defined before their first use in the
+technical sections below.
 
-> Does the pinned released CoDE-Stop forced-answer implementation measure a
-> completed candidate answer, or a mixed span that can include subsequent
-> generated text?
-
-The completed work is an audit, not a new deployed stopping method. The
-separate risk-controlled P1 protocol remains frozen and paused at a
-prior-work gate. M2 was a distinct, preregistered measurement/reproducibility
-attempt; it stopped for a runtime failure before its confirmation threshold.
-
-## A 30-second tour
-
-| If you want to understand… | Start here |
+| Term | Meaning in this audit |
 | --- | --- |
-| The candidate-only versus mixed-span distinction | [The measurement boundary](#the-measurement-boundary) |
-| What the frozen evidence supports—and does not | [Evidence at a glance](#evidence-at-a-glance) |
-| The synthetic, reusable audit code | [Core implementation](#core-implementation) |
-| The separate Colab runtime qualification | [Colab handoff](#separate-colab-qualification-handoff) |
+| **Pinned release** | The exact upstream CoDE-Stop revision under audit: [`b5081e7c2abe23bb1d19649421cc13522fee7c50`](https://github.com/sudoparsa/CoDE-Stop/tree/b5081e7c2abe23bb1d19649421cc13522fee7c50). “Released” means this implementation behavior, which can be more specific than the paper’s prose or equations. |
+| **Reasoning prefix** | Tokens the model has already generated while solving a problem, before an answer is elicited. |
+| **Checkpoint** | A preselected point in that reasoning prefix at which the audit starts an answer probe. It is fixed in advance, not a learned stopping decision. |
+| **Forced-answer probe** | A greedy continuation from a checkpoint using a fixed cue that asks the model to produce a boxed answer. The parser expects the first nonempty generated text to begin with `{...}`; the audit represents the resulting candidate as `\boxed{...}`. It measures a candidate; it is not necessarily the model’s final deployed output. |
+| **Candidate answer and boundary** | In a forced probe, the audit represents the generated brace expression as a syntactically complete outer `\boxed{...}` expression. The boundary is its matching closing outer brace. |
+| **Released full-span confidence (`c_full`)** | The probability aggregate reconstructed from the released probe’s configured generated span. That span can extend past the candidate boundary. It is a confidence-like likelihood aggregate, not a calibrated probability of correctness. |
+| **Boundary-Aligned Confidence (BAC)** | This project’s descriptive name for the ordinary geometric mean of token probabilities inside the candidate boundary only. The calculation is not new; BAC is a comparison instrument, not a proposed metric or stopping policy. |
+| **Shared greedy pair** | In the paired studies described below, a released-endpoint and candidate-boundary measurement derived from the same prompt, reasoning prefix, cue, and deterministic greedy rollout. Only endpoint semantics and accounting differ. |
+| **Valid shared pair** | A shared pair meeting the frozen integrity rule for the study in which it is used. Invalid, malformed, and unavailable outcomes are retained rather than repaired. The confirmatory protocol uses the stricter term **primary-valid** for pairs that also satisfy its predeclared agreement and finite-score checks. |
+| **Counterfactual token accounting** | An offline count of probe tokens that would not have been generated had an already-closed candidate boundary ended the probe. It is not observed whole-task token saving, latency, or energy use. |
 
-## Why confidence-based early stopping matters
+**Parser convention.** The forced-probe parser expects the generated suffix
+above, treats escaped braces as structural, and tracks nesting. The offline
+audit parser instead attempts the first `\boxed` marker in decoded text and
+ignores escaped braces. Both report malformed or no-close outcomes rather than
+repairing them; see the
+[package README](src/README.md).
 
-Reasoning models can spend many tokens continuing after they have enough
-information to answer. Early stopping could reduce that cost, but a wrong
-confidence measurement can turn a token-saving decision into a wrong-answer
-decision. This audit asks whether the released probe confidence is measuring
-the candidate answer alone or a mixture of the answer and text generated after
-it.
+**Exact score convention.** Let `q_j` be the selected probability for
+one-based generated token `j`, and let `n` be the released endpoint’s
+selected-token count. The
+released reconstruction is
+`c_full = exp((sum_{j=2}^{n-1} log q_j) / (n - 1))`: its numerator excludes
+the first and last selected tokens while its denominator remains `n - 1`. BAC
+is `exp(mean(log q_j))` over only the token positions strictly between the
+token pieces containing the opening and matching closing outer braces. These
+are likelihood aggregates, not calibrated probabilities of correctness.
 
-## What was audited
+## The audited comparison
 
-[CoDE-Stop](https://arxiv.org/abs/2604.04930) samples designated reasoning
-checkpoints, forces a candidate answer, turns greedy token probabilities into a
-confidence-like signal, and combines that signal with its released stopping
-logic. Q3–Q6 reproduced and audited this measurement path without modifying
-CoDE-Stop. Q7 then held the prompt, reasoning-prefix token IDs, forced suffix,
-and greedy decoding fixed while comparing quantization formats.
+The completed record uses two designs: offline boundary accounting on previously
+recorded, unmodified released traces, and a controlled matched-rollout comparison. The diagram
+shows the latter. At a fixed point in an already-generated reasoning trace,
+the controlled comparison holds the prompt, reasoning prefix, answer cue, and
+greedy decoding path fixed, then compares only where the resulting probability
+aggregate ends.
 
-The historical discovery sandbox used `Qwen3-4B` in `Q4_K_M`. It is not a
-faithful BF16 reproduction. See [docs/methodology.md](docs/methodology.md) and
-[docs/experiment_timeline.md](docs/experiment_timeline.md) for the frozen
-sequence.
+```text
+reasoning prefix
+      │
+      ├── checkpoint ── forced-answer probe ── first complete \boxed{...}
+      │                                      │
+      │                                      ├── candidate-only endpoint → BAC
+      │                                      │
+      │                                      └── later continuation → released c_full
+      │
+      └── repeat at frozen checkpoints
+```
 
-## Evidence at a glance
+For the forced-probe comparison, the candidate boundary is the matching closing
+brace of the first outer `\boxed{...}` expression. It handles nested braces,
+but it is a fixed parser convention for this audit—not a general mathematical-
+answer extractor.
 
-| Track | What the frozen evidence supports | Boundary of that evidence |
+## Precision labels
+
+`Q4_K_M` and `Q8_0` are GGUF (llama.cpp model-file) quantizations of the
+studied model: respectively a 4-bit and an 8-bit format. `BF16` (bfloat16) is
+a higher-precision floating-point fidelity anchor. They are not different model
+architectures. Q4_K_M is retained only as the historical exploration backend,
+Q8_0 is the practical validation backend, and BF16 is a small fixed-prefix
+anchor rather than a throughput-matched reproduction.
+
+## Study map and current status
+
+The labels below are internal study identifiers, not benchmark names or model
+versions.
+
+| Label | What it is | Current status and permitted interpretation |
 | --- | --- | --- |
-| Q3 / Q6 | In the studied Q4_K_M batches, the released span can extend past a completed candidate answer. | Q6 correctness ranking was not evaluable. |
-| Q7 | Q8_0 matched BF16 candidate identity more often than Q4_K_M on fixed prefixes. | This is not full-model fidelity. |
-| M1 | Paired released-endpoint and candidate-boundary measurements differed in a 16-example development-feasibility study. | It is not a new score, controller, or realized end-to-end saving. |
-| M2 | The planned confirmation threshold was not reached because the Q8_0 runtime stalled. | **Effect not confirmed — runtime infeasible**, not a null result. |
-| L1 | The pinned released equation semantics are formally reproducible with synthetic fixtures. | Formal and non-empirical only. |
+| **Q0–Q7** | Historical source-pinned reproduction and audit stages. | Frozen. Q4_K_M findings are discovery evidence; Q7 is a fixed-prefix precision check, not end-to-end model fidelity. |
+| **M1** | Preregistered 16-example Q8_0 paired measurement-feasibility study. | Completed. It supports a narrow measurement-audit finding, not a new score, controller, or deployment claim. |
+| **M2** | Preregistered 100-example Q8_0 confirmation attempt. | Runtime-infeasible after 18 primary-valid paired checkpoints, below its fixed minimum of 80. This is neither positive evidence nor a null-effect result. |
+| **L1** | Synthetic, source-to-equation audit of the pinned implementation. | Completed formal reproducibility evidence only; no model, benchmark, or inference was used. |
+| **P1** | Retained risk-controlled follow-on protocol. | Frozen and paused at a direct prior-work gate; no P1 inference is authorized. It is not a result. |
 
-The detailed records below preserve the same boundaries rather than smoothing
-them into a broader performance claim.
+Three individual frozen stages are named below: **Q3** is the development
+probe batch, **Q6** is the independent preregistered holdout, and **Q7** is the
+fixed-prefix precision comparison.
 
-### Established observations
+## What the evidence supports
 
-- In the studied Q4 batches, released probes often continued after a candidate
-  answer had already closed. That post-answer text was included in the released
-  confidence span.
-- The independent, preregistered Q6 holdout reproduced this boundary issue.
-- Ending Q6 probes at the already-completed candidate boundary would reduce
-  trial-probe generation from 756 to 156 tokens: **a 79.37% counterfactual
-  reduction in trial-probe generated tokens on the Q6 holdout.** It is not a
-  claim about total inference savings or answer accuracy.
-- Q7 found that Q8 is substantially closer to BF16 than Q4 in candidate
-  identity on its frozen-prefix samples.
-- M1's preregistered Q8_0 feasibility study found continuation after the
-  candidate boundary in 44/44 valid shared pairs. Its score and illustrative
-  threshold differences support only a narrow measurement-audit paper path,
-  not a new score, safe threshold, or realized end-to-end saving.
+### Established within the stated scope
 
-### Exploratory observations
+- **Released measurement spans can extend past a completed candidate.** In Q3
+  (the historical Q4_K_M development batch) and Q6 (the preregistered
+  holdout), released probes contained post-boundary continuation in their
+  scored span. This is a measurement-span result, not a claim that CoDE-Stop
+  is inaccurate.
+- **M1 reproduced the endpoint difference under Q8_0.** In a preregistered
+  16-example development-feasibility study, all **44/44 valid shared pairs**
+  continued after the matching candidate boundary. The median absolute
+  `c_full`–BAC difference was `0.119`; 34/44 pairs differed by at least `0.05`.
+  These are paired measurement results only.
+- **The Q6 token result is strictly counterfactual.** Ending an already-closed
+  candidate boundary would reduce counted forced-answer probe generation from
+  756 to 156 tokens: a **79.37% counterfactual reduction in probe tokens** on
+  that holdout. It is not a measured end-to-end saving.
+- **Q8_0 was closer to BF16 candidate identity than Q4_K_M** on Q7’s frozen
+  fixed-prefix subset: 11/12 candidate strings matched exactly after the
+  audit’s fixed text normalization for BF16–Q8_0, versus 5/12 for
+  BF16–Q4_K_M. This is probe-level candidate fidelity only.
+- **L1 formalized released implementation semantics.** On its valid domain,
+  the pinned release’s default degeneration component—a history-based
+  stop-trigger component—reduces to a recency-weighted count of strict
+  decreases in log confidence on scores first clamped to a fixed floor, after
+  an initial warm-up. This is a source-level result, not evidence
+  that changing the equation improves a policy. See the
+  [L1 decision record](docs/l1_equation_to_execution_decision.md).
 
-- In the Q3 development batch, Boundary-Aligned Confidence (BAC) ranked
-  candidate correctness much more strongly than the released full-span signal.
-- Q6 contained zero correct probe candidates, so that ranking could not be
-  evaluated on the holdout.
+### Exploratory only
 
-### Confirmatory status
+On the frozen Q3 development probes, BAC ranked candidate correctness more
+strongly than `c_full`. That result is exploratory: the independent Q6 holdout
+had no correct directly evaluable probe candidates, so it could not evaluate
+the same ranking question. No absolute BAC threshold is established as safe.
 
-- M2 froze a new 100-example Q8_0 confirmatory measurement audit and passed
-  load-only Q8_0/BF16 preflights. It then stopped after 18 primary-valid pairs,
-  below the fixed minimum of 80, when the single-slot Q8 runtime stalled during
-  a base completion and did not recover. It is **not a null-effect result** and
-  it supplies no BF16 or generalization evidence. See the
-  [M2 abort record](docs/m2_runtime_feasibility_abort.md).
+### Not confirmed
 
-## The measurement boundary
+M2 could not complete its confirmatory audit because the pinned Q8_0 runtime
+stalled mid-generation and its one-request-at-a-time local server did not
+recover. The study produced 18 primary-valid paired checkpoints, below its
+predeclared 80-pair minimum; its BF16 anchor did not begin. The correct classification is **EFFECT NOT
+CONFIRMED — runtime infeasible**. See the [M2 abort record](docs/m2_runtime_feasibility_abort.md).
 
-BAC is the standard geometric mean of the pre-specified candidate-answer token
-probabilities, stopping at the matching outer `\boxed{...}` close. No
-post-box token is included.
+## Verify this public release
 
-```text
-released measurement:  candidate answer  →  later continuation  →  c_full
-boundary measurement:  candidate answer                       →  BAC
-```
-
-BAC is a local descriptive label for this boundary calculation, not a novelty
-claim or a deployed stopping policy.
-
-![Conceptual comparison of released and boundary-aligned probes](figures/boundary_aligned_probe.svg)
-
-The figure is conceptual. It illustrates the measurement boundary, not a new
-model architecture or an established performance result.
-
-## Precision check: Q4 vs Q8 vs BF16
-
-Q7 is a controlled fixed-prefix probe study, not an end-to-end benchmark.
-
-| Frozen paired checkpoints | Exact normalized candidate agreement |
-| --- | ---: |
-| Q8_0 vs Q4_K_M | 15 / 30 |
-| BF16 vs Q8_0 | 11 / 12 |
-| BF16 vs Q4_K_M | 5 / 12 |
-
-Q4 BAC rankings were partly aligned with the higher-precision formats, but
-candidate fidelity was not established. Consequently, Q4 is retained as a
-historical exploratory/discovery backend; Q8 is the primary practical
-validation backend; and BF16 is a selective fidelity anchor. The Q7 BF16 set
-is only 12 frozen checkpoints, so it does not establish full-model fidelity.
-
-`TQ1_0` is recorded only as a negative extreme post-training ternary stress
-condition: it completed 0 of 32 candidate boxes and was unusable for candidate
-or BAC comparison. It is not treated as a BitNet-style trained ternary model.
-See [docs/findings.md](docs/findings.md) and the compact
-[Q7 result](results/q7_precision_summary.json).
-
-## Research ledger
-
-M1's terminal decision is **Measurement-paper path justified**: a paper can
-audit the named released forced-answer endpoint and score semantics against an
-exact candidate boundary, with the documented reporting omissions and
-nonclaims. Its result record is
-[here](docs/m1_forced_answer_measurement_semantics_decision.md).
-
-M2's terminal classification is **EFFECT NOT CONFIRMED — runtime infeasible**.
-It did not reach its fixed 80-pair requirement or start its BF16 anchor. Any
-future replication must be separately authorized, use a runtime validated by a
-non-benchmark soak test, and use an untouched cohort; it cannot repair or
-rerun M2. P1 remains paused. The retained P1 protocol is historical context,
-not an authorized next action.
-
-L1 is a completed, no-model equation-to-execution audit of the same pinned
-release. Its synthetic fixtures confirm that the released default degeneration
-path is a recency-weighted count of strict drops in floor-clamped log
-confidence, rather than an independently active log-space instability
-criterion. This is a formal reproducibility observation—not evidence that an
-altered equation improves stopping. See the [frozen L1 protocol](docs/l1_equation_to_execution_protocol.md)
-and [decision record](docs/l1_equation_to_execution_decision.md).
-
-## Repository structure
-
-```text
-docs/       Research overview, public protocols/decision records, findings, limits, and resume text
-figures/    One editable conceptual SVG
-results/    Compact aggregate metrics and artifact provenance only
-src/        Reusable audit package and a standard-library result packager
-tests/      Synthetic offline tests; no model, GPU, dataset, or network required
-examples/   A small synthetic released-span-versus-boundary demo
-activation_continuation/  Drive-backed Colab runtime qualification package; no benchmark runner
-licenses/   Upstream-license and attribution notices
-```
-
-## Separate Colab qualification handoff
-
-`activation_continuation/` is a separate, frozen pre-benchmark execution
-package for a controlled activation-continuation validity study. It preserves
-the earlier local CUDA failure as an environment limitation, not a scientific
-result. The package does not alter Q0–Q7, M1, M2, L1, or the paused P1 study.
-
-The thin [Colab notebook](activation_continuation/notebooks/colab_runner.ipynb)
-clones an exact reviewed commit, installs a fully pinned environment, records
-the GPU/runtime identity, verifies the pinned Qwen3-1.7B revision, and runs a
-synthetic qualification with immediate Drive-backed checkpoints. It stops on
-any failure and intentionally contains no benchmark runner. See the exact
-[Colab workflow](activation_continuation/docs/colab_execution.md).
-
-> [!WARNING]
-> The frozen runtime requires native BF16 and at least **16 GiB detected
-> VRAM**. Prefer an **L4**, **A100**, or **H100**; the preflight remains the
-> authoritative hardware decision. A **T4** is not an eligible target because
-> it lacks native BF16 support. Do not switch the configuration to FP16, lower
-> the resource gate, or continue to benchmark generation after a failure.
-
-Private model snapshots, hidden activations, generated text, benchmark
-material, and Drive-specific paths are excluded from this repository. A
-passing qualification is only a runtime result; it does not authorize
-benchmark generation.
-
-## Core implementation
-
-`src/reasoning_confidence/` exposes the clean, reusable audit logic developed
-from the frozen experiments:
-
-- candidate-boundary detection with nested-brace handling;
-- released full-span confidence reconstruction and BAC;
-- version-pinned, synthetic-only reconstructions of released CoDE-Stop score,
-  degeneration, ramp, cap, terminal-membership, and stop expressions;
-- released-style checkpoint membership handling;
-- a manually configured, greedy local llama.cpp `/completion` probe that stops
-  at the candidate boundary; and
-- small helpers for candidate agreement, paired confidence comparison, and
-  probe-token accounting.
-
-The package is intentionally small and uses the Python standard library. It
-does not start a server, load a model, contain upstream source code, or claim
-to reproduce all Q0–Q7 inference end-to-end without the separate frozen
-artifact tree. See [src/README.md](src/README.md) for the public API boundary.
-
-## Reproducing the analyses
-
-Run the synthetic implementation checks from the repository root:
+**Requirements:** CPython 3.10+ and a checkout of this repository. The public
+checks use the standard library only. They do not download a model, start
+llama.cpp, contact a server, or access benchmark rows.
 
 ```powershell
 $env:PYTHONPATH = "src"
-python -m unittest discover -s tests -v
+python -B -m unittest discover -s tests -v
 python examples\synthetic_probe_demo.py
-```
-
-They use only synthetic token and log-probability fixtures. No GPU, weights,
-dataset, network access, or llama.cpp server is required.
-
-The 5–10 minute public check rebuilds the compact result summary without a
-model, server, or dataset download:
-
-```powershell
 python src\rebuild_public_results.py --output results\rebuilt_aggregate_results.json
 ```
 
-The command reads [results/aggregate_inputs.json](results/aggregate_inputs.json)
-and produces the same public schema as
-[results/aggregate_results.json](results/aggregate_results.json). The output is
-ignored by Git so it can be inspected locally.
+Expected behavior:
 
-If you have access to the separate frozen artifact tree, the packager can
-rebuild the compact inputs from aggregate JSON only:
+- the synthetic suite passes (**34 tests** at this release);
+- the demo prints a candidate-only versus released-full-span example; and
+- the result packager writes a compact aggregate JSON file and reports its
+  SHA-256.
+
+These commands verify the public reconstruction and aggregate packaging. They
+do **not** reproduce historical model inference. `requirements.txt` is not
+required for the commands above.
+
+If you have authorized access to the separate frozen artifact tree, the
+packager can rebuild the compact public result summary from its aggregate JSON
+files:
 
 ```powershell
 python src\rebuild_public_results.py --artifact-root <path-to-frozen-artifacts> --output <output-path>
 ```
 
-It reads no model weights and starts no inference runtime. A complete
-inference rerun requires the upstream repositories, model and dataset terms,
-pinned revisions, and appropriate local hardware; see
-[docs/environment.md](docs/environment.md).
+It reads no weights and starts no inference runtime. A full historical rerun
+requires the upstream repositories, model and dataset terms, exact revisions,
+and suitable hardware; see [docs/environment.md](docs/environment.md).
 
-## What this repository does not show
+## What is implemented here
 
-This repository does not claim a faithful BF16 reproduction, an end-to-end
-accuracy improvement, a new state of the art, a validated new stopping method,
-a publication or submission, or 79% total inference saving. M2 did not reach
-a confirmatory conclusion because its Q8 runtime failed. The completed evidence
-is bounded by the recorded model revision, prompts, datasets, checkpoint
-semantics, quantization formats, and sample sizes. Q4 results must not be
-assumed to generalize to BF16.
+`src/reasoning_confidence/` is a small, standard-library audit package. It
+contains:
 
-See [docs/limitations.md](docs/limitations.md) for the full scope and
-[docs/publication_scope.md](docs/publication_scope.md) for the conditional
-paper story.
+- candidate-boundary parsing with nested-brace and malformed-output handling;
+- released full-span reconstruction and candidate-only BAC calculation;
+- released-style checkpoint token-ID membership utilities;
+- source-pinned synthetic reconstructions of score, degeneration, ramp, cap,
+  terminal membership, and stop semantics; and
+- helpers for candidate agreement, paired comparisons, and probe-token
+  accounting.
+
+The package does not contain an automatic model runner, upstream CoDE-Stop
+code, raw study artifacts, or a claim to reproduce Q0–Q7 end-to-end. See the
+[package boundary](src/README.md) and [methodology](docs/methodology.md).
+
+## Repository map
+
+| Path | Purpose |
+| --- | --- |
+| [`docs/`](docs/) | Public protocols, decisions, methods, findings, limitations, and related-work boundaries. |
+| [`results/`](results/) | Compact aggregate metrics and provenance only. |
+| [`src/`](src/) | Standard-library audit utilities and result packager. |
+| [`tests/`](tests/) | Offline synthetic tests; no model, GPU, dataset, or network is required. |
+| [`examples/`](examples/) | A synthetic released-span versus candidate-boundary demonstration. |
+| [`activation_continuation/`](activation_continuation/) | Separate, frozen runtime-qualification support package; it is not a benchmark runner. |
+
+## Provenance and reproducibility boundary
+
+| Item | Publicly recorded scope |
+| --- | --- |
+| Upstream method | CoDE-Stop commit [`b5081e7c2abe23bb1d19649421cc13522fee7c50`](https://github.com/sudoparsa/CoDE-Stop/tree/b5081e7c2abe23bb1d19649421cc13522fee7c50) |
+| Historical model | `Qwen/Qwen3-4B` at revision `1cfa9a7208912126459214e8b04321603b3df60c` |
+| Historical runtime | llama.cpp commit `7798007a29a90e3053e799394da48cf53a2f8e0f` |
+| Public data policy | Aggregate metrics and provenance only; no raw trajectories, token log-probabilities, benchmark rows, weights, or binaries |
+| Detailed provenance | [results/artifact_provenance.json](results/artifact_provenance.json) and [docs/environment.md](docs/environment.md) |
+
+## Separate runtime qualification package
+
+`activation_continuation/` is intentionally separate from the completed audit
+evidence. It is a frozen, non-benchmark Colab handoff for checking whether a
+specified activation-continuation runtime can execute and recover correctly.
+A passing qualification is a runtime result only: it does not authorize
+benchmark generation, alter M1/M2/L1, or resume P1. See the
+[Colab workflow](activation_continuation/docs/colab_execution.md).
+
+## Deliberately out of scope
+
+This repository does **not** claim:
+
+- a faithful BF16 reproduction or whole-model Q4-to-BF16 generalization;
+- a new confidence score, early-stopping algorithm, or calibrated threshold;
+- improved final-answer accuracy, a safe stopping policy, or a new state of
+  the art;
+- observed total token, latency, energy, or end-to-end compute savings; or
+- a completed confirmatory M2 result, cross-model result, or publication.
+
+The viable paper story is a narrow, reproducible code-to-paper measurement
+audit. Its evidence and limitations are intentionally recorded together in
+[docs/findings.md](docs/findings.md), [docs/limitations.md](docs/limitations.md),
+and [docs/publication_scope.md](docs/publication_scope.md).
+
+## Suggested reading paths
+
+| Goal | Read |
+| --- | --- |
+| Understand the source-to-equation semantic audit | [L1 protocol](docs/l1_equation_to_execution_protocol.md) and [L1 decision](docs/l1_equation_to_execution_decision.md) |
+| Inspect the main paired evidence | [M1 decision](docs/m1_forced_answer_measurement_semantics_decision.md) and [findings](docs/findings.md) |
+| Understand the failed confirmation attempt | [M2 protocol](docs/m2_confirmatory_measurement_protocol.md) and [abort record](docs/m2_runtime_feasibility_abort.md) |
+| Reuse the public utilities | [package README](src/README.md) and [`tests/`](tests/) |
+| Review the paused follow-on direction | [research overview](docs/research_overview.md) and [next-study protocol](docs/next_study_protocol.md) |
 
 ## References
 
 - Parsa Hosseini, Sumit Nawathe, Mahdi Salmani, Meisam Razaviyayn, and Soheil
   Feizi. [*Early Stopping for Large Reasoning Models via Confidence
   Dynamics*](https://arxiv.org/abs/2604.04930), 2026. Upstream implementation:
-  [sudoparsa/CoDE-Stop](https://github.com/sudoparsa/CoDE-Stop), audited at
-  commit `b5081e7c2abe23bb1d19649421cc13522fee7c50`.
-- [*Conformal Thinking*](https://arxiv.org/abs/2602.03814), 2026. Used as the
-  related risk-control reference for the next-study protocol only.
-- [*PUMA / Stop When Reasoning Converges*](https://arxiv.org/abs/2605.17672),
-  2026. Related work only; semantic redundancy is outside this study.
-- [*From token probabilities to calibrated confidence*](https://arxiv.org/abs/2608.07827),
-  2026. Related work only; its calibration methods are not part of the primary
-  method.
-- Sun et al. [*Stop When Enough*](https://aclanthology.org/2026.acl-long.1256/),
-  2026. REFRAIN already uses answer-only boxed-region geometric-mean
-  likelihood, so this audit does not claim that score or generic forced-answer
-  stopping as new.
+  [sudoparsa/CoDE-Stop](https://github.com/sudoparsa/CoDE-Stop).
+- [*Conformal Thinking: Risk Control for Reasoning on a Compute Budget*](https://arxiv.org/abs/2602.03814),
+  2026. Related risk-control reference only.
+- Sun et al. [*Stop When Enough: Adaptive Early-Stopping for Chain-of-Thought
+  Reasoning*](https://aclanthology.org/2026.acl-long.1256/), 2026. REFRAIN
+  already uses answer-only boxed-region geometric-mean likelihood; this audit
+  does not claim that score or generic forced-answer stopping as new.
 
 See [CITATION.cff](CITATION.cff) and
 [licenses/UPSTREAM_NOTICES.md](licenses/UPSTREAM_NOTICES.md) for citation and
